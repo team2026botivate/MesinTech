@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useData } from '@/lib/data-context';
 import { useAuth } from '@/lib/auth-context';
-import { FileText, Package, RotateCcw, Zap, Users, DollarSign, Bell, BarChart3, TrendingUp, Settings } from 'lucide-react';
+import { FileText, Package, RotateCcw, Zap, Users, Archive, DollarSign, Bell, BarChart3, TrendingUp, Settings } from 'lucide-react';
 
 const allModules = [
   {
@@ -45,6 +45,14 @@ const allModules = [
     description: 'Manage customers and suppliers',
     color: 'bg-green-50 border-green-200',
     iconColor: 'text-green-600',
+  },
+  {
+    href: '/inventory',
+    label: 'Inventory',
+    icon: Archive,
+    description: 'Manage products and stock levels',
+    color: 'bg-indigo-50 border-indigo-200',
+    iconColor: 'text-indigo-600',
   },
   {
     href: '/payments',

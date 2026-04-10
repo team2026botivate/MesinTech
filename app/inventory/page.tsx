@@ -101,51 +101,45 @@ export default function InventoryPage() {
         </Button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card className="bg-primary/5 border-primary/10">
-          <CardContent className="p-6">
-            <div className="flex items-center gap-4">
-              <div className="p-3 bg-primary/10 rounded-xl text-primary">
-                <Boxes className="w-6 h-6" />
-              </div>
-              <div>
-                <p className="text-sm font-medium text-muted-foreground">Total Products</p>
-                <h3 className="text-2xl font-bold">{products.length}</h3>
-              </div>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+        <Card className="bg-primary/5 border-primary/10 p-2.5">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-primary/10 rounded-lg text-primary">
+              <Boxes className="w-5 h-5" />
             </div>
-          </CardContent>
+            <div>
+              <p className="text-[10px] font-bold text-muted-foreground uppercase opacity-70">Products</p>
+              <h3 className="text-lg font-bold leading-tight">{products.length}</h3>
+            </div>
+          </div>
         </Card>
         
-        <Card className="bg-blue-500/5 border-blue-500/10">
-          <CardContent className="p-6">
-            <div className="flex items-center gap-4">
-              <div className="p-3 bg-blue-500/10 rounded-xl text-blue-500">
-                <Package className="w-6 h-6" />
-              </div>
-              <div>
-                <p className="text-sm font-medium text-muted-foreground">Total Stock</p>
-                <h3 className="text-2xl font-bold">
-                  {products.reduce((acc, p) => acc + p.stock, 0)}
-                </h3>
-              </div>
+        <Card className="bg-blue-500/5 border-blue-500/10 p-2.5">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-blue-500/10 rounded-lg text-blue-500">
+              <Package className="w-5 h-5" />
             </div>
-          </CardContent>
+            <div>
+              <p className="text-[10px] font-bold text-muted-foreground uppercase opacity-70">Stock</p>
+              <h3 className="text-lg font-bold leading-tight">
+                {products.reduce((acc, p) => acc + p.stock, 0)}
+              </h3>
+            </div>
+          </div>
         </Card>
 
-        <Card className="bg-emerald-500/5 border-emerald-500/10">
-          <CardContent className="p-6">
-            <div className="flex items-center gap-4">
-              <div className="p-3 bg-emerald-500/10 rounded-xl text-emerald-500">
-                <Tag className="w-6 h-6" />
-              </div>
-              <div>
-                <p className="text-sm font-medium text-muted-foreground">Total Value</p>
-                <h3 className="text-2xl font-bold">
-                  {formatCurrency(products.reduce((acc, p) => acc + (p.price * p.stock), 0))}
-                </h3>
-              </div>
+        <Card className="bg-emerald-500/5 border-emerald-500/10 p-2.5">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-emerald-500/10 rounded-lg text-emerald-500">
+              <Tag className="w-5 h-5" />
             </div>
-          </CardContent>
+            <div>
+              <p className="text-[10px] font-bold text-muted-foreground uppercase opacity-70">Value</p>
+              <h3 className="text-lg font-bold leading-tight">
+                {formatCurrency(products.reduce((acc, p) => acc + (p.price * p.stock), 0))}
+              </h3>
+            </div>
+          </div>
         </Card>
       </div>
 

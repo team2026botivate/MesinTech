@@ -44,29 +44,25 @@ export default function ReturnsPage() {
         <ReturnForm />
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2">
-        <Card className="bg-primary/5 border-primary/10">
-          <CardHeader className="pb-2">
-            <CardDescription className="text-xs uppercase tracking-wider font-semibold">Sales Returns</CardDescription>
-            <CardTitle className="text-2xl font-bold">{formatCurrency(salesReturnsTotal)}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-xs text-muted-foreground">
-              Across {returns.filter((r) => r.type === 'sales').length} recorded returns
+      <div className="grid gap-3 md:grid-cols-2">
+        <Card className="bg-primary/5 border-primary/10 p-3 flex flex-row items-center justify-between">
+          <div className="space-y-0.5">
+            <p className="text-[10px] uppercase tracking-wider font-bold text-primary/70">Sales Returns</p>
+            <p className="text-[10px] text-muted-foreground">
+              {returns.filter((r) => r.type === 'sales').length} recorded
             </p>
-          </CardContent>
+          </div>
+          <div className="text-xl font-bold">{formatCurrency(salesReturnsTotal)}</div>
         </Card>
 
-        <Card className="bg-secondary/5 border-secondary/10">
-          <CardHeader className="pb-2">
-            <CardDescription className="text-xs uppercase tracking-wider font-semibold">Purchase Returns</CardDescription>
-            <CardTitle className="text-2xl font-bold">{formatCurrency(purchaseReturnsTotal)}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-xs text-muted-foreground">
-              Across {returns.filter((r) => r.type === 'purchase').length} recorded returns
+        <Card className="bg-secondary/5 border-secondary/10 p-3 flex flex-row items-center justify-between">
+          <div className="space-y-0.5">
+            <p className="text-[10px] uppercase tracking-wider font-bold text-secondary/70">Purchase Returns</p>
+            <p className="text-[10px] text-muted-foreground">
+              {returns.filter((r) => r.type === 'purchase').length} recorded
             </p>
-          </CardContent>
+          </div>
+          <div className="text-xl font-bold">{formatCurrency(purchaseReturnsTotal)}</div>
         </Card>
       </div>
 

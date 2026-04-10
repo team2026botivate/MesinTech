@@ -62,67 +62,79 @@ export default function PaymentsPage() {
         <PaymentForm />
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Outstanding</CardTitle>
-            <Receipt className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{formatCurrency(totalOutstanding)}</div>
-            <p className="text-xs text-muted-foreground mt-1">{transactionsWithBalances.length} pending invoices</p>
-          </CardContent>
-        </Card>
-
-        <Card className="border-red-100 bg-red-50/10">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Overdue Amount</CardTitle>
-            <AlertCircle className="h-4 w-4 text-red-500" />
-          </CardHeader>
-          <CardContent>
-            <div className={cn("text-2xl font-bold", totalOverdue > 0 ? "text-red-600" : "text-emerald-600")}>
-              {formatCurrency(totalOverdue)}
+      <Card className="overflow-hidden">
+        <div className="flex flex-col md:flex-row divide-y md:divide-y-0 md:divide-x border-b">
+          <div className="flex-1 p-3 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-muted rounded-lg">
+                <Receipt className="h-4 w-4 text-muted-foreground" />
+              </div>
+              <div>
+                <p className="text-[10px] font-bold uppercase opacity-60 tracking-tight">Outstanding</p>
+                <div className="text-lg font-bold">{formatCurrency(totalOutstanding)}</div>
+              </div>
             </div>
-            <p className="text-xs text-muted-foreground mt-1">{overdueTransactions.length} overdue record(s)</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Due Soon (7d)</CardTitle>
-            <Clock className="h-4 w-4 text-amber-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {formatCurrency(
-                upcomingTransactions
-                  .filter((item) => {
-                    const daysUntilDue = Math.ceil(
-                      (new Date(item.dueDate).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24)
-                    );
-                    return daysUntilDue <= 7 && daysUntilDue > 0;
-                  })
-                  .reduce((sum, item) => sum + item.balance, 0)
-              )}
+            <div className="text-[10px] text-muted-foreground bg-muted/50 px-1.5 py-0.5 rounded-full">
+              {transactionsWithBalances.length} invoices
             </div>
-            <p className="text-xs text-muted-foreground mt-1">Nearing terms deadline</p>
-          </CardContent>
-        </Card>
-      </div>
+          </div>
+
+          <div className="flex-1 p-3 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-red-100/30 rounded-lg">
+                <AlertCircle className="h-4 w-4 text-red-500" />
+              </div>
+              <div>
+                <p className="text-[10px] font-bold uppercase opacity-60 tracking-tight text-red-700">Overdue</p>
+                <div className={cn("text-lg font-bold", totalOverdue > 0 ? "text-red-600" : "text-emerald-600")}>
+                  {formatCurrency(totalOverdue)}
+                </div>
+              </div>
+            </div>
+            <div className="text-[10px] text-red-600 bg-red-100/30 px-1.5 py-0.5 rounded-full">
+              {overdueTransactions.length} late
+            </div>
+          </div>
+
+          <div className="flex-1 p-3 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-amber-50 rounded-lg">
+                <Clock className="h-4 w-4 text-amber-500" />
+              </div>
+              <div>
+                <p className="text-[10px] font-bold uppercase opacity-60 tracking-tight text-amber-700">Due Soon</p>
+                <div className="text-lg font-bold">
+                  {formatCurrency(
+                    upcomingTransactions
+                      .filter((item) => {
+                        const daysUntilDue = Math.ceil(
+                          (new Date(item.dueDate).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24)
+                        );
+                        return daysUntilDue <= 7 && daysUntilDue > 0;
+                      })
+                      .reduce((sum, item) => sum + item.balance, 0)
+                  )}
+                </div>
+              </div>
+            </div>
+            <p className="text-[10px] text-muted-foreground bg-amber-50 px-1.5 py-0.5 rounded-full">7d window</p>
+          </div>
+        </div>
+      </Card>
 
       <div className="space-y-6">
         {overdueTransactions.length > 0 && (
-          <Card className="border-red-200">
-            <CardHeader className="bg-red-50/30">
+          <Card className="border-red-200 overflow-hidden mt-6">
+            <CardHeader className="bg-red-50/30 p-4">
               <div className="flex items-center gap-2">
-                <AlertCircle className="w-5 h-5 text-red-500" />
+                <AlertCircle className="w-4 h-4 text-red-500" />
                 <div>
-                  <CardTitle className="text-lg">Overdue Invoices</CardTitle>
-                  <CardDescription>Invoices that have exceeded their payment terms.</CardDescription>
+                  <CardTitle className="text-sm font-bold">Overdue Invoices</CardTitle>
+                  <CardDescription className="text-[10px]">Exceeded payment terms.</CardDescription>
                 </div>
               </div>
             </CardHeader>
-            <CardContent className="pt-6">
+            <CardContent className="p-4 pt-4">
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -156,17 +168,17 @@ export default function PaymentsPage() {
         )}
 
         {upcomingTransactions.length > 0 && (
-          <Card>
-            <CardHeader>
+          <Card className="mt-6">
+            <CardHeader className="p-4 pb-2">
               <div className="flex items-center gap-2">
-                <CalendarDays className="w-5 h-5 text-primary" />
+                <CalendarDays className="w-4 h-4 text-primary" />
                 <div>
-                  <CardTitle className="text-lg">Upcoming Payments</CardTitle>
-                  <CardDescription>Accounts receivable/payable within terms.</CardDescription>
+                  <CardTitle className="text-sm font-bold">Upcoming Payments</CardTitle>
+                  <CardDescription className="text-[10px]">Receivable/payable within terms.</CardDescription>
                 </div>
               </div>
             </CardHeader>
-            <CardContent>
+            <CardContent className="p-4 pt-2">
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -209,11 +221,11 @@ export default function PaymentsPage() {
         )}
 
         {transactionsWithBalances.length === 0 && (
-          <Card className="border-dashed bg-muted/20">
-            <CardContent className="py-16 text-center">
-              <CheckCircle className="w-12 h-12 text-emerald-500 mx-auto mb-4 opacity-20" />
-              <p className="text-muted-foreground text-lg">All payments are settled</p>
-              <p className="text-sm text-muted-foreground">You have no outstanding invoices at this time.</p>
+          <Card className="border-dashed bg-muted/20 mt-6">
+            <CardContent className="py-8 text-center px-4">
+              <CheckCircle className="w-8 h-8 text-emerald-500 mx-auto mb-2 opacity-30" />
+              <p className="text-muted-foreground font-bold text-sm">All payments are settled</p>
+              <p className="text-[10px] text-muted-foreground">No outstanding invoices at this time.</p>
             </CardContent>
           </Card>
         )}

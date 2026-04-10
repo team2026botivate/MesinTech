@@ -68,67 +68,75 @@ export default function ExpensesPage() {
         <ExpenseForm />
       </div>
 
-      <div className="grid gap-4 md:grid-cols-3">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Volume</CardTitle>
-            <Wallet className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{formatCurrency(totalExpenses)}</div>
-            <p className="text-xs text-muted-foreground mt-1">{expenses.length} record(s)</p>
-          </CardContent>
-        </Card>
+      <Card className="overflow-hidden">
+        <div className="flex flex-col md:flex-row divide-y md:divide-y-0 md:divide-x border-b">
+          <div className="flex-1 p-3 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-muted rounded-lg">
+                <Wallet className="h-4 w-4 text-muted-foreground" />
+              </div>
+              <div>
+                <p className="text-[10px] font-bold uppercase opacity-60 tracking-tight">Total Volume</p>
+                <div className="text-lg font-bold">{formatCurrency(totalExpenses)}</div>
+              </div>
+            </div>
+            <div className="text-[10px] text-muted-foreground bg-muted/50 px-1.5 py-0.5 rounded-full">
+              {expenses.length} records
+            </div>
+          </div>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Approved</CardTitle>
-            <CheckCircle2 className="h-4 w-4 text-emerald-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-emerald-600">{formatCurrency(approvedTotal)}</div>
-            <p className="text-xs text-muted-foreground mt-1">
+          <div className="flex-1 p-3 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-emerald-50 rounded-lg">
+                <CheckCircle2 className="h-4 w-4 text-emerald-500" />
+              </div>
+              <div>
+                <p className="text-[10px] font-bold uppercase opacity-60 tracking-tight">Approved</p>
+                <div className="text-lg font-bold text-emerald-600">{formatCurrency(approvedTotal)}</div>
+              </div>
+            </div>
+            <div className="text-[10px] text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded-full">
               {expenses.filter((e) => e.status === 'approved').length} verified
-            </p>
-          </CardContent>
-        </Card>
+            </div>
+          </div>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Pending Review</CardTitle>
-            <Clock className="h-4 w-4 text-amber-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-amber-600">{formatCurrency(pendingTotal)}</div>
-            <p className="text-xs text-muted-foreground mt-1">
-              {expenses.filter((e) => e.status === 'pending').length} awaiting
-            </p>
-          </CardContent>
-        </Card>
-      </div>
+          <div className="flex-1 p-3 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-amber-50 rounded-lg">
+                <Clock className="h-4 w-4 text-amber-500" />
+              </div>
+              <div>
+                <p className="text-[10px] font-bold uppercase opacity-60 tracking-tight">Pending</p>
+                <div className="text-lg font-bold text-amber-600">{formatCurrency(pendingTotal)}</div>
+              </div>
+            </div>
+            <div className="text-[10px] text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded-full">
+              {expenses.filter((e) => e.status === 'pending').length} waiting
+            </div>
+          </div>
+        </div>
+      </Card>
 
-      <div className="grid gap-4 grid-cols-2 md:grid-cols-4">
-        {(['courier', 'travel', 'food', 'other'] as const).map((category) => (
-          <Card key={category} className="bg-muted/30">
-            <CardHeader className="pb-2 p-4">
-              <CardTitle className="text-xs font-semibold uppercase tracking-wider flex items-center gap-2">
-                <span>{categoryIcons[category]}</span>
-                {categoryLabels[category]}
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="p-4 pt-0">
-              <div className="text-lg font-bold">{formatCurrency(calculateCategoryTotal(category))}</div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+      <Card className="bg-muted/10 border-none shadow-none">
+        <div className="flex flex-wrap md:flex-nowrap divide-x divide-muted-foreground/10">
+          {(['courier', 'travel', 'food', 'other'] as const).map((category) => (
+            <div key={category} className="flex-1 p-2.5 flex items-center justify-between px-4">
+              <div className="flex items-center gap-2">
+                <span className="text-base">{categoryIcons[category]}</span>
+                <p className="text-[10px] font-bold uppercase tracking-tight text-muted-foreground/80">{categoryLabels[category]}</p>
+              </div>
+              <div className="text-sm font-bold text-foreground/80">{formatCurrency(calculateCategoryTotal(category))}</div>
+            </div>
+          ))}
+        </div>
+      </Card>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Expense Records</CardTitle>
-          <CardDescription>A detailed list of all tracked business costs.</CardDescription>
+      <Card className="mt-6">
+        <CardHeader className="p-4 pb-2">
+          <CardTitle className="text-base font-bold">Expense Records</CardTitle>
+          <CardDescription className="text-xs">A detailed list of all tracked business costs.</CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-4 pt-0">
           <Tabs
             defaultValue="all"
             onValueChange={(v) => setFilterCategory(v as any)}
