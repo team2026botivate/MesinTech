@@ -105,7 +105,7 @@ export default function SalesPage() {
                 placeholder="Search invoices..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-9"
+                className="pl-9 bg-background/50 border-muted-foreground/20"
               />
             </div>
             <Select value={statusFilter} onValueChange={setStatusFilter}>
@@ -142,16 +142,16 @@ export default function SalesPage() {
           ) : (
             <div className="rounded-md border">
               <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Invoice</TableHead>
-                    <TableHead>Customer</TableHead>
-                    <TableHead>Date</TableHead>
-                    <TableHead className="text-right">Amount</TableHead>
-                    <TableHead className="text-right">Paid</TableHead>
-                    <TableHead className="text-right">Balance</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
+                <TableHeader className="bg-muted/30">
+                  <TableRow className="hover:bg-transparent">
+                    <TableHead className="font-bold text-xs uppercase tracking-wider">Invoice</TableHead>
+                    <TableHead className="font-bold text-xs uppercase tracking-wider">Customer</TableHead>
+                    <TableHead className="font-bold text-xs uppercase tracking-wider">Date</TableHead>
+                    <TableHead className="text-right font-bold text-xs uppercase tracking-wider">Amount</TableHead>
+                    <TableHead className="text-right font-bold text-xs uppercase tracking-wider">Paid</TableHead>
+                    <TableHead className="text-right font-bold text-xs uppercase tracking-wider">Balance</TableHead>
+                    <TableHead className="font-bold text-xs uppercase tracking-wider">Status</TableHead>
+                    <TableHead className="text-right font-bold text-xs uppercase tracking-wider">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>

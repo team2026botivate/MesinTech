@@ -47,6 +47,7 @@ import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Separator } from '@/components/ui/separator';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { toast } from 'sonner';
 import { User } from '@/lib/types';
@@ -200,125 +201,135 @@ export default function SettingsPage() {
           <h1 className="text-2xl font-bold tracking-tight text-foreground">Settings</h1>
           <p className="text-sm text-muted-foreground">Manage users and their individual page access.</p>
         </div>
+        <Button onClick={handleOpenAddModal} className="flex items-center gap-2">
+          <UserPlus className="w-4 h-4" />
+          Add User
+        </Button>
       </div>
 
       <Card>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0">
-          <div>
-            <CardTitle>Users</CardTitle>
-            <CardDescription>Manage team members and configure their specific module access.</CardDescription>
-          </div>
-          <div className="flex items-center gap-4">
-            <div className="relative w-64">
-              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+        <CardHeader>
+          <CardTitle>Users</CardTitle>
+          <CardDescription>Manage team members and configure their specific module access.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="flex flex-col sm:flex-row gap-4 mb-6">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
                 placeholder="Search users..."
-                className="pl-9"
+                className="pl-9 bg-background/50 border-muted-foreground/20"
                 value={userSearch}
                 onChange={(e) => setUserSearch(e.target.value)}
               />
             </div>
-            <Button onClick={handleOpenAddModal} className="flex items-center gap-2">
-              <UserPlus className="w-4 h-4" />
-              Add User
-            </Button>
           </div>
-        </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Name</TableHead>
-                <TableHead>Username</TableHead>
-                <TableHead>Role</TableHead>
-                <TableHead>Access</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredUsers.map((user) => (
-                <TableRow key={user.id}>
-                  <TableCell className="font-medium">{user.name}</TableCell>
-                  <TableCell>{user.username}</TableCell>
-                  <TableCell>
-                    <Badge variant={user.role === 'admin' ? 'default' : 'secondary'}>
-                      {user.role}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex flex-wrap gap-1 max-w-[300px]">
-                      {user.accessibleModules?.map(m => (
-                        <Badge key={m} variant="outline" className="text-[10px] px-1 py-0 h-4">
-                          {allModules.find(am => am.href === m)?.label || m.replace('/', '')}
+
+          <div className="rounded-md border">
+            <Table>
+              <TableHeader className="bg-muted/30">
+                <TableRow className="hover:bg-transparent">
+                  <TableHead className="font-bold text-xs uppercase tracking-wider">Name</TableHead>
+                  <TableHead className="font-bold text-xs uppercase tracking-wider">Username</TableHead>
+                  <TableHead className="font-bold text-xs uppercase tracking-wider">Role</TableHead>
+                  <TableHead className="font-bold text-xs uppercase tracking-wider">Access</TableHead>
+                  <TableHead className="text-right font-bold text-xs uppercase tracking-wider">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {filteredUsers.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={5} className="h-24 text-center text-muted-foreground">
+                      No users found.
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  filteredUsers.map((user) => (
+                    <TableRow key={user.id}>
+                      <TableCell className="font-medium text-foreground">{user.name}</TableCell>
+                      <TableCell>{user.username}</TableCell>
+                      <TableCell>
+                        <Badge variant={user.role === 'admin' ? 'default' : 'secondary'}>
+                          {user.role}
                         </Badge>
-                      ))}
-                    </div>
-                  </TableCell>
-                  <TableCell className="text-right space-x-2">
-                    <Button 
-                      variant="ghost" 
-                      size="icon"
-                      onClick={() => handleOpenEditModal(user)}
-                    >
-                      <Pencil className="w-4 h-4" />
-                    </Button>
-                    <Button 
-                      variant="ghost" 
-                      size="icon" 
-                      className="text-destructive hover:bg-destructive/10"
-                      onClick={() => handleDeleteUser(user.id)}
-                      disabled={user.id === currentUser.id}
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              ))}
-              {filteredUsers.length === 0 && (
-                <TableRow>
-                  <TableCell colSpan={5} className="h-24 text-center text-muted-foreground">
-                    No users found.
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex flex-wrap gap-1 max-w-[300px]">
+                          {user.accessibleModules?.map(m => (
+                            <Badge key={m} variant="outline" className="text-[10px] px-1 py-0 h-4">
+                              {allModules.find(am => am.href === m)?.label || m.replace('/', '')}
+                            </Badge>
+                          ))}
+                        </div>
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex justify-end gap-2">
+                          <Button 
+                            variant="ghost" 
+                            size="icon"
+                            onClick={() => handleOpenEditModal(user)}
+                            className="h-8 w-8"
+                          >
+                            <Pencil className="w-4 h-4" />
+                          </Button>
+                          <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            className="h-8 w-8 text-destructive hover:bg-destructive/10"
+                            onClick={() => handleDeleteUser(user.id)}
+                            disabled={user.id === currentUser.id}
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          </div>
         </CardContent>
       </Card>
 
       {/* User Modal */}
       <Dialog open={isUserModalOpen} onOpenChange={setIsUserModalOpen}>
-        <DialogContent className="sm:max-w-[500px] p-0 overflow-hidden border-none shadow-2xl">
+        <DialogContent className="sm:max-w-[650px] p-0 overflow-hidden border-none shadow-2xl">
           <form onSubmit={handleSubmitUser}>
-            <DialogHeader className="p-8 pb-4">
-              <DialogTitle className="text-2xl font-bold">{editingUser ? 'Edit User' : 'Add New User'}</DialogTitle>
-              <DialogDescription className="text-base">
-                Configure user profile and module permissions.
+            <DialogHeader className="px-6 py-4 border-b">
+              <DialogTitle className="text-xl font-bold tracking-tight">{editingUser ? 'Edit User Profile' : 'Add New User'}</DialogTitle>
+              <DialogDescription className="text-sm">
+                Configure user profile details and page-level access permissions.
               </DialogDescription>
             </DialogHeader>
             
-            <div className="px-8 pb-8 space-y-6">
+            <div className="px-6 py-8 space-y-8">
               {/* Profile Section */}
               <div className="space-y-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="h-4 w-1 bg-primary rounded-full" />
+                  <h3 className="text-sm font-bold text-foreground uppercase tracking-tight">Profile Details</h3>
+                </div>
+                
                 <div className="grid grid-cols-2 gap-4">
                   <div className="grid gap-2">
-                    <Label htmlFor="name" className="text-sm font-semibold">Full Name</Label>
+                    <Label htmlFor="name" className="text-xs font-bold uppercase opacity-70">Full Name</Label>
                     <Input
                       id="name"
                       placeholder="Enter full name"
                       value={formData.name}
                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                       required
-                      className="bg-muted/30 border-none focus-visible:ring-1 focus-visible:ring-primary h-10"
+                      className="bg-background border-muted-foreground/20 h-10"
                     />
                   </div>
                   <div className="grid gap-2">
-                    <Label htmlFor="role" className="text-sm font-semibold">Role</Label>
+                    <Label htmlFor="role" className="text-xs font-bold uppercase opacity-70">System Role</Label>
                     <Select 
                       value={formData.role} 
                       onValueChange={(value: 'admin' | 'user') => setFormData({ ...formData, role: value })}
                     >
-                      <SelectTrigger className="bg-muted/30 border-none focus-visible:ring-1 focus-visible:ring-primary h-10">
+                      <SelectTrigger className="bg-background border-muted-foreground/20 h-10">
                         <SelectValue placeholder="Select role" />
                       </SelectTrigger>
                       <SelectContent>
@@ -331,18 +342,18 @@ export default function SettingsPage() {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="grid gap-2">
-                    <Label htmlFor="username" className="text-sm font-semibold">Username</Label>
+                    <Label htmlFor="username" className="text-xs font-bold uppercase opacity-70">Username</Label>
                     <Input
                       id="username"
                       placeholder="username"
                       value={formData.username}
                       onChange={(e) => setFormData({ ...formData, username: e.target.value })}
                       required
-                      className="bg-muted/30 border-none focus-visible:ring-1 focus-visible:ring-primary h-10"
+                      className="bg-background border-muted-foreground/20 h-10"
                     />
                   </div>
                   <div className="grid gap-2">
-                    <Label htmlFor="password" className="text-sm font-semibold">Password</Label>
+                    <Label htmlFor="password" className="text-xs font-bold uppercase opacity-70">Password</Label>
                     <div className="relative group/pass">
                       <Input
                         id="password"
@@ -351,12 +362,12 @@ export default function SettingsPage() {
                         value={formData.password}
                         onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                         required={!editingUser}
-                        className="bg-muted/30 border-none focus-visible:ring-1 focus-visible:ring-primary h-10 pr-10"
+                        className="bg-background border-muted-foreground/20 h-10 pr-10"
                       />
                       <Button
                         type="button"
                         variant="ghost"
-                        size="icon-sm"
+                        size="icon"
                         onClick={() => setShowPassword(!showPassword)}
                         className="absolute right-1 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-primary transition-colors h-8 w-8"
                       >
@@ -371,36 +382,39 @@ export default function SettingsPage() {
                 </div>
               </div>
 
-              {/* Page Access Section - Reference Match */}
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
+              <Separator className="opacity-50" />
+
+              {/* Page Access Section */}
+              <div className="space-y-4">
+                <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-2">
-                    <Label className="text-sm font-bold text-foreground">Page Access</Label>
-                    <div className="flex items-center gap-1.5 ml-2">
-                      <Button 
-                        type="button" 
-                        variant="link"
-                        size="sm"
-                        onClick={handleSelectAll}
-                        className="h-auto p-0 text-[13px]"
-                      >
-                        Select All
-                      </Button>
-                      <span className="text-muted-foreground/30 text-xs">|</span>
-                      <Button 
-                        type="button" 
-                        variant="link"
-                        size="sm"
-                        onClick={handleSelectNone}
-                        className="h-auto p-0 text-[13px]"
-                      >
-                        None
-                      </Button>
-                    </div>
+                    <div className="h-4 w-1 bg-primary rounded-full" />
+                    <h3 className="text-sm font-bold text-foreground uppercase tracking-tight">Module Permissions</h3>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Button 
+                      type="button" 
+                      variant="link"
+                      size="sm"
+                      onClick={handleSelectAll}
+                      className="h-auto p-0 text-[11px] font-bold uppercase text-primary"
+                    >
+                      All
+                    </Button>
+                    <span className="text-muted-foreground/30 text-xs">|</span>
+                    <Button 
+                      type="button" 
+                      variant="link"
+                      size="sm"
+                      onClick={handleSelectNone}
+                      className="h-auto p-0 text-[11px] font-bold uppercase text-muted-foreground"
+                    >
+                      None
+                    </Button>
                   </div>
                 </div>
 
-                <div className="border border-border rounded-xl p-6 bg-card/50">
+                <div className="border border-muted-foreground/10 rounded-2xl p-6 bg-muted/5">
                   <div className="grid grid-cols-2 gap-y-4 gap-x-8">
                     {/* Fixed Home Access */}
                     <div className="flex items-center space-x-3 opacity-60">
@@ -432,18 +446,17 @@ export default function SettingsPage() {
               </div>
             </div>
 
-            <DialogFooter className="px-8 py-6 bg-muted/20 border-t flex flex-row justify-end gap-3">
+            <DialogFooter className="px-6 py-4 border-t bg-muted/10">
               <Button 
                 type="button" 
-                variant="ghost" 
+                variant="outline" 
                 onClick={() => setIsUserModalOpen(false)}
-                className="hover:bg-muted font-medium"
               >
                 Cancel
               </Button>
               <Button 
                 type="submit" 
-                className="px-8 font-semibold shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-all"
+                className="px-8 font-semibold shadow-sm"
               >
                 {editingUser ? 'Save Changes' : 'Create User'}
               </Button>
