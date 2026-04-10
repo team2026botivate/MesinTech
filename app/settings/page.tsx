@@ -18,7 +18,17 @@ import {
   Save,
   Layout,
   Eye,
-  EyeOff
+  EyeOff,
+  LayoutDashboard,
+  FileText,
+  Package,
+  RotateCcw,
+  Zap,
+  Building2,
+  Truck,
+  Archive,
+  DollarSign,
+  Bell
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -42,15 +52,18 @@ import { toast } from 'sonner';
 import { User } from '@/lib/types';
 
 const allModules = [
-  { href: '/sales', label: 'Sales' },
-  { href: '/purchases', label: 'Purchases' },
-  { href: '/returns', label: 'Returns' },
-  { href: '/expenses', label: 'Expenses' },
-  { href: '/companies', label: 'Companies' },
-  { href: '/inventory', label: 'Inventory' },
-  { href: '/payments', label: 'Payments' },
-  { href: '/notifications', label: 'Notifications' },
-  { href: '/settings', label: 'Settings' },
+  { href: '/home', label: 'Dashboard', icon: 'LayoutDashboard' },
+  { href: '/sales', label: 'Sales', icon: 'FileText' },
+  { href: '/purchases', label: 'Purchases', icon: 'Package' },
+  { href: '/returns', label: 'Returns', icon: 'RotateCcw' },
+  { href: '/expenses', label: 'Expenses', icon: 'Zap' },
+  { href: '/companies', label: 'Companies', icon: 'Building2' },
+  { href: '/customers', label: 'Customers', icon: 'Users' },
+  { href: '/dispatch', label: 'Dispatch', icon: 'Truck' },
+  { href: '/inventory', label: 'Inventory', icon: 'Archive' },
+  { href: '/payments', label: 'Payments', icon: 'DollarSign' },
+  { href: '/notifications', label: 'Notifications', icon: 'Bell' },
+  { href: '/settings', label: 'Settings', icon: 'Settings' },
 ];
 
 export default function SettingsPage() {

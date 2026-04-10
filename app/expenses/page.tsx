@@ -3,17 +3,20 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { ExpenseForm } from '@/components/expense-form';
 import { useData } from '@/lib/data-context';
 import { formatCurrency, formatDate } from '@/lib/format';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Plus, X, Wallet, CheckCircle2, Clock } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Wallet, CheckCircle2, Clock, Package, Plane, Utensils, FileText, Search, Filter } from 'lucide-react';
 
 export default function ExpensesPage() {
   const { expenses, companies, isLoaded } = useData();
-  const [filterCategory, setFilterCategory] = useState<'all' | 'courier' | 'travel' | 'food' | 'other'>('all');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [categoryFilter, setCategoryFilter] = useState<string>('all');
+  const [statusFilter, setStatusFilter] = useState<string>('all');
 
   if (!isLoaded) {
     return (
@@ -28,13 +31,18 @@ export default function ExpensesPage() {
     return companies.find((c) => c.id === companyId)?.name || 'Unknown';
   };
 
-  const filteredExpenses = expenses.filter((e) => filterCategory === 'all' || e.category === filterCategory);
-
   const categoryIcons = {
-    courier: '📦',
-    travel: '✈️',
-    food: '🍽️',
-    other: '📋',
+    courier: Package,
+    travel: Plane,
+    food: Utensils,
+    other: FileText,
+  };
+
+  const iconColors = {
+    courier: 'text-blue-500',
+    travel: 'text-purple-500',
+    food: 'text-orange-500',
+    other: 'text-slate-500',
   };
 
   const categoryLabels = {
@@ -44,19 +52,19 @@ export default function ExpensesPage() {
     other: 'Other',
   };
 
-  const calculateCategoryTotal = (category: string) => {
-    return expenses
-      .filter((e) => e.category === category)
-      .reduce((sum, e) => sum + e.amount, 0);
-  };
+  const filteredExpenses = expenses.filter((e) => {
+    const matchesSearch = 
+      searchQuery === '' || 
+      e.expenseNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (e.notes && e.notes.toLowerCase().includes(searchQuery.toLowerCase())) ||
+      (e.courierName && e.courierName.toLowerCase().includes(searchQuery.toLowerCase())) ||
+      (e.vendorName && e.vendorName.toLowerCase().includes(searchQuery.toLowerCase()));
+    
+    const matchesCategory = categoryFilter === 'all' || e.expenseType === categoryFilter;
+    const matchesStatus = statusFilter === 'all' || e.status === statusFilter;
 
-  const totalExpenses = expenses.reduce((sum, e) => sum + e.amount, 0);
-  const approvedTotal = expenses
-    .filter((e) => e.status === 'approved')
-    .reduce((sum, e) => sum + e.amount, 0);
-  const pendingTotal = expenses
-    .filter((e) => e.status === 'pending')
-    .reduce((sum, e) => sum + e.amount, 0);
+    return matchesSearch && matchesCategory && matchesStatus;
+  });
 
   return (
     <div className="space-y-6">
@@ -68,134 +76,115 @@ export default function ExpensesPage() {
         <ExpenseForm />
       </div>
 
-      <Card className="overflow-hidden">
-        <div className="flex flex-col md:flex-row divide-y md:divide-y-0 md:divide-x border-b">
-          <div className="flex-1 p-3 flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-muted rounded-lg">
-                <Wallet className="h-4 w-4 text-muted-foreground" />
-              </div>
-              <div>
-                <p className="text-[10px] font-bold uppercase opacity-60 tracking-tight">Total Volume</p>
-                <div className="text-lg font-bold">{formatCurrency(totalExpenses)}</div>
-              </div>
-            </div>
-            <div className="text-[10px] text-muted-foreground bg-muted/50 px-1.5 py-0.5 rounded-full">
-              {expenses.length} records
-            </div>
+      <Card>
+        <CardHeader>
+          <div>
+            <CardTitle>Expense Records</CardTitle>
+            <CardDescription>A detailed list of all tracked business costs and operational expenses.</CardDescription>
           </div>
-
-          <div className="flex-1 p-3 flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-emerald-50 rounded-lg">
-                <CheckCircle2 className="h-4 w-4 text-emerald-500" />
-              </div>
-              <div>
-                <p className="text-[10px] font-bold uppercase opacity-60 tracking-tight">Approved</p>
-                <div className="text-lg font-bold text-emerald-600">{formatCurrency(approvedTotal)}</div>
-              </div>
-            </div>
-            <div className="text-[10px] text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded-full">
-              {expenses.filter((e) => e.status === 'approved').length} verified
-            </div>
-          </div>
-
-          <div className="flex-1 p-3 flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-amber-50 rounded-lg">
-                <Clock className="h-4 w-4 text-amber-500" />
-              </div>
-              <div>
-                <p className="text-[10px] font-bold uppercase opacity-60 tracking-tight">Pending</p>
-                <div className="text-lg font-bold text-amber-600">{formatCurrency(pendingTotal)}</div>
-              </div>
-            </div>
-            <div className="text-[10px] text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded-full">
-              {expenses.filter((e) => e.status === 'pending').length} waiting
-            </div>
-          </div>
-        </div>
-      </Card>
-
-      <Card className="bg-muted/10 border-none shadow-none">
-        <div className="flex flex-wrap md:flex-nowrap divide-x divide-muted-foreground/10">
-          {(['courier', 'travel', 'food', 'other'] as const).map((category) => (
-            <div key={category} className="flex-1 p-2.5 flex items-center justify-between px-4">
-              <div className="flex items-center gap-2">
-                <span className="text-base">{categoryIcons[category]}</span>
-                <p className="text-[10px] font-bold uppercase tracking-tight text-muted-foreground/80">{categoryLabels[category]}</p>
-              </div>
-              <div className="text-sm font-bold text-foreground/80">{formatCurrency(calculateCategoryTotal(category))}</div>
-            </div>
-          ))}
-        </div>
-      </Card>
-
-      <Card className="mt-6">
-        <CardHeader className="p-4 pb-2">
-          <CardTitle className="text-base font-bold">Expense Records</CardTitle>
-          <CardDescription className="text-xs">A detailed list of all tracked business costs.</CardDescription>
         </CardHeader>
-        <CardContent className="p-4 pt-0">
-          <Tabs
-            defaultValue="all"
-            onValueChange={(v) => setFilterCategory(v as any)}
-          >
-            <TabsList className="mb-4">
-              <TabsTrigger value="all">All</TabsTrigger>
-              <TabsTrigger value="courier">Courier</TabsTrigger>
-              <TabsTrigger value="travel">Travel</TabsTrigger>
-              <TabsTrigger value="food">Food</TabsTrigger>
-              <TabsTrigger value="other">Other</TabsTrigger>
-            </TabsList>
+        <CardContent>
+          <div className="flex flex-col sm:flex-row gap-4 mb-6">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Search expenses..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-9"
+              />
+            </div>
+            <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+              <SelectTrigger className="w-full sm:w-[180px]">
+                <Filter className="h-4 w-4 mr-2" />
+                <SelectValue placeholder="Category" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Categories</SelectItem>
+                <SelectItem value="courier">Courier</SelectItem>
+                <SelectItem value="travel">Travel</SelectItem>
+                <SelectItem value="food">Food</SelectItem>
+                <SelectItem value="other">Other</SelectItem>
+              </SelectContent>
+            </Select>
+            <Select value={statusFilter} onValueChange={setStatusFilter}>
+              <SelectTrigger className="w-full sm:w-[180px]">
+                <SelectValue placeholder="Status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Status</SelectItem>
+                <SelectItem value="pending">Pending</SelectItem>
+                <SelectItem value="approved">Approved</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
 
-            <TabsContent value="all" className="mt-0">
-              {filteredExpenses.length === 0 ? (
-                <div className="text-center py-12 text-muted-foreground">
-                  No records found in this category
-                </div>
-              ) : (
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Description</TableHead>
-                      <TableHead>Category</TableHead>
-                      <TableHead>Entity</TableHead>
-                      <TableHead>Date</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead className="text-right">Amount</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {filteredExpenses.map((expense) => (
+          {filteredExpenses.length === 0 ? (
+            <div className="text-center py-12">
+              <p className="text-muted-foreground">No expenses found</p>
+            </div>
+          ) : (
+            <div className="rounded-md border">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Number</TableHead>
+                    <TableHead>Category</TableHead>
+                    <TableHead>Details</TableHead>
+                    <TableHead>Entity</TableHead>
+                    <TableHead>Date</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead className="text-right">Amount</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {filteredExpenses.map((expense) => {
+                    const Icon = categoryIcons[expense.expenseType as keyof typeof categoryIcons];
+                    return (
                       <TableRow key={expense.id}>
-                        <TableCell className="font-medium">
-                          <span className="mr-2">{categoryIcons[expense.category]}</span>
-                          {expense.description}
+                        <TableCell className="font-medium">{expense.expenseNumber}</TableCell>
+                        <TableCell>
+                          <div className="flex items-center gap-2">
+                            <Icon className={`w-4 h-4 ${iconColors[expense.expenseType as keyof typeof iconColors]}`} />
+                            <span className="capitalize">{expense.expenseType}</span>
+                          </div>
                         </TableCell>
-                        <TableCell className="capitalize">{expense.category}</TableCell>
-                        <TableCell className="text-muted-foreground italic">
+                        <TableCell className="max-w-[200px] truncate text-muted-foreground text-sm">
+                          {expense.expenseType === 'courier' && expense.courierName}
+                          {expense.expenseType === 'travel' && `${expense.fromLocation} to ${expense.toLocation}`}
+                          {expense.expenseType === 'food' && expense.vendorName}
+                          {expense.expenseType === 'other' && (expense.notes || 'General Expense')}
+                        </TableCell>
+                        <TableCell className="italic">
                           {getCompanyName(expense.companyId)}
                         </TableCell>
-                        <TableCell className="text-muted-foreground">{formatDate(expense.date)}</TableCell>
+                        <TableCell className="text-muted-foreground">{formatDate(expense.expenseDate)}</TableCell>
                         <TableCell>
                           <Badge 
-                            variant="outline" 
-                            className={expense.status === 'approved' ? 'border-emerald-500 text-emerald-600 bg-emerald-50' : 'border-amber-500 text-amber-600 bg-amber-50'}
+                            variant={expense.status === 'approved' ? 'secondary' : 'default'}
+                            className={
+                              expense.status === 'approved'
+                                ? 'bg-emerald-100 text-emerald-800 hover:bg-emerald-100'
+                                : 'bg-amber-100 text-amber-800 hover:bg-amber-100'
+                            }
                           >
                             {expense.status.charAt(0).toUpperCase() + expense.status.slice(1)}
                           </Badge>
                         </TableCell>
-                        <TableCell className="text-right font-bold text-foreground">
-                          {formatCurrency(expense.amount)}
+                        <TableCell className="text-right font-bold">
+                          {formatCurrency(expense.totalExpense)}
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <ExpenseForm initialExpense={expense} />
                         </TableCell>
                       </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              )}
-            </TabsContent>
-          </Tabs>
+                    );
+                  })}
+                </TableBody>
+              </Table>
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>

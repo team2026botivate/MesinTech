@@ -4,19 +4,22 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useData } from '@/lib/data-context';
 import { useAuth } from '@/lib/auth-context';
-import { 
-  FileText, 
-  DollarSign, 
-  Users, 
-  Home, 
-  Package, 
+import {
+  FileText,
+  DollarSign,
+  Users,
+  Home,
+  Package,
   Archive,
-  RotateCcw, 
-  Zap, 
+  RotateCcw,
+  Zap,
   Bell,
-  Settings as SettingsIcon 
+  Settings as SettingsIcon,
+  Truck,
+  Building2
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { cn } from '@/lib/utils';
 
 const navItems = [
@@ -25,7 +28,9 @@ const navItems = [
   { href: '/purchases', label: 'Purchases', icon: Package },
   { href: '/returns', label: 'Returns', icon: RotateCcw },
   { href: '/expenses', label: 'Expenses', icon: Zap },
-  { href: '/companies', label: 'Companies', icon: Users },
+  { href: '/companies', label: 'Companies', icon: Building2 },
+  { href: '/customers', label: 'Customers', icon: Users },
+  { href: '/dispatch', label: 'Dispatch', icon: Truck },
   { href: '/inventory', label: 'Inventory', icon: Archive },
   { href: '/payments', label: 'Payments', icon: DollarSign },
   { href: '/notifications', label: 'Notifications', icon: Bell },
@@ -39,7 +44,7 @@ export function Sidebar() {
 
   if (!isLoaded || !user) return null;
 
-  const accessibleItems = navItems.filter(item => 
+  const accessibleItems = navItems.filter(item =>
     user.accessibleModules?.includes(item.href) || item.href === '/home'
   );
 

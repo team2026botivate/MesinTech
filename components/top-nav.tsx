@@ -16,10 +16,15 @@ import {
   Bell, 
   LogOut, 
   User as UserIcon,
-  Settings as SettingsIcon 
+  Settings as SettingsIcon,
+  Truck,
+  Building2,
+  TrendingUp
 } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
 import { NotificationHeader } from './notification-header';
 
 const navItems = [
@@ -28,7 +33,9 @@ const navItems = [
   { href: '/purchases', label: 'Purchases', icon: Package },
   { href: '/returns', label: 'Returns', icon: RotateCcw },
   { href: '/expenses', label: 'Expenses', icon: Zap },
-  { href: '/companies', label: 'Companies', icon: Users },
+  { href: '/companies', label: 'Companies', icon: Building2 },
+  { href: '/customers', label: 'Customers', icon: Users },
+  { href: '/dispatch', label: 'Dispatch', icon: Truck },
   { href: '/inventory', label: 'Inventory', icon: Archive },
   { href: '/payments', label: 'Payments', icon: DollarSign },
   { href: '/notifications', label: 'Notifications', icon: Bell },

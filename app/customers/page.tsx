@@ -3,11 +3,11 @@
 import { useData } from '@/lib/data-context';
 import { CompanyForm } from '@/components/company-form';
 import { AgeingConfigForm } from '@/components/ageing-config-form';
-import { Mail, Phone, Building2 } from 'lucide-react';
+import { Mail, Phone, Users } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 
-export default function SuppliersPage() {
+export default function CustomersPage() {
   const { companies, isLoaded } = useData();
 
   if (!isLoaded) {
@@ -18,39 +18,39 @@ export default function SuppliersPage() {
     );
   }
 
-  const suppliers = companies.filter((c) => c.type === 'supplier');
+  const customers = companies.filter((c) => c.type === 'customer');
 
   return (
     <div className="space-y-8">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-foreground">Companies</h1>
-          <p className="text-sm text-muted-foreground">Manage your list of suppliers.</p>
+          <h1 className="text-2xl font-bold tracking-tight text-foreground">Customers</h1>
+          <p className="text-sm text-muted-foreground">Manage your list of customers.</p>
         </div>
-        <CompanyForm defaultType="supplier" />
+        <CompanyForm defaultType="customer" />
       </div>
 
       <div className="space-y-12">
         <section>
           <div className="flex items-center gap-2 mb-6">
-            <Building2 className="w-5 h-5 text-muted-foreground" />
-            <h2 className="text-lg font-semibold text-foreground">Suppliers ({suppliers.length})</h2>
+            <Users className="w-5 h-5 text-primary" />
+            <h2 className="text-lg font-semibold text-foreground">Customers ({customers.length})</h2>
           </div>
-
-          {suppliers.length === 0 ? (
+          
+          {customers.length === 0 ? (
             <Card className="bg-muted/30 border-dashed">
               <CardContent className="py-12 text-center">
-                <p className="text-muted-foreground">No supplier records found</p>
+                <p className="text-muted-foreground">No customer records found</p>
               </CardContent>
             </Card>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {suppliers.map((company) => (
+              {customers.map((company) => (
                 <Card key={company.id} className="group hover:shadow-md transition-shadow">
                   <CardHeader className="pb-4">
                     <div className="flex items-start justify-between">
                       <div className="space-y-1">
-                        <CardTitle className="text-base font-bold text-foreground leading-tight transition-colors">
+                        <CardTitle className="text-base font-bold text-foreground leading-tight group-hover:text-primary transition-colors">
                           {company.name}
                         </CardTitle>
                         <Badge variant="outline" className="text-[10px] uppercase font-bold tracking-tighter py-0">

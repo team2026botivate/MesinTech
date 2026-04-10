@@ -1,9 +1,9 @@
 'use client';
 
-import React, { createContext, useContext } from 'react';
+import React, { createContext, useContext, useEffect } from 'react';
 import { useLocalStorage } from './hooks/use-local-storage';
-import { dummyCompanies, dummyTransactions, dummyPayments, dummyReturns, dummyExpenses, dummyNotifications, dummyUser, dummyProducts } from './dummy-data';
-import { Company, Transaction, Payment, Return, Expense, Notification, User, Product } from './types';
+import { dummyCompanies, dummyTransactions, dummyPayments, dummyReturns, dummyExpenses, dummyNotifications, dummyUser, dummyProducts, dummyDispatches } from './dummy-data';
+import { Company, Transaction, Payment, Return, Expense, Notification, User, Product, Dispatch } from './types';
 
 interface DataContextType {
   companies: Company[];
@@ -42,6 +42,11 @@ interface DataContextType {
   updateUser: (user: User) => void;
   deleteUser: (userId: string) => void;
   isLoaded: boolean;
+  dispatches: Dispatch[];
+  setDispatches: (dispatches: Dispatch[]) => void;
+  addDispatch: (dispatch: Dispatch) => void;
+  updateDispatch: (dispatch: Dispatch) => void;
+  deleteDispatch: (dispatchId: string) => void;
 }
 
 const DataContext = createContext<DataContextType | undefined>(undefined);
@@ -83,8 +88,12 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
     'erp_products',
     dummyProducts
   );
+  const [dispatches, setDispatchesState, dispatchesLoaded] = useLocalStorage<Dispatch[]>(
+    'erp_dispatches',
+    dummyDispatches
+  );
 
-  const isLoaded = companiesLoaded && transactionsLoaded && paymentsLoaded && returnsLoaded && expensesLoaded && notificationsLoaded && selectedCompanyLoaded && usersLoaded && productsLoaded;
+  const isLoaded = companiesLoaded && transactionsLoaded && paymentsLoaded && returnsLoaded && expensesLoaded && notificationsLoaded && selectedCompanyLoaded && usersLoaded && productsLoaded && dispatchesLoaded;
 
   const setCompanies = (data: Company[]) => setCompaniesState(data);
   const setTransactions = (data: Transaction[]) => setTransactionsState(data);
@@ -92,6 +101,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
   const setReturns = (data: Return[]) => setReturnsState(data);
   const setExpenses = (data: Expense[]) => setExpensesState(data);
   const setNotifications = (data: Notification[]) => setNotificationsState(data);
+  const setDispatches = (data: Dispatch[]) => setDispatchesState(data);
 
   const addCompany = (company: Company) => {
     setCompanies([...companies, company]);
@@ -274,6 +284,50 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
     setProductsState(products.filter((p) => p.id !== productId));
   };
 
+  const addDispatch = (dispatch: Dispatch) => {
+    setDispatches([...dispatches, dispatch]);
+  };
+
+  const updateDispatch = (dispatch: Dispatch) => {
+    setDispatches(dispatches.map((d) => (d.id === dispatch.id ? dispatch : d)));
+  };
+
+  const deleteDispatch = (dispatchId: string) => {
+    setDispatches(dispatches.filter((d) => d.id !== dispatchId));
+  };
+
+  useEffect(() => {
+    if (!isLoaded) return;
+    
+    let updatedNotifications = [...notifications];
+    let changed = false;
+
+    // Check for low stock
+    products.forEach(product => {
+      if (product.stock <= 10) {
+        const notifExists = notifications.find(n => n.type === 'low_stock' && n.transactionId === product.id);
+        if (!notifExists) {
+          updatedNotifications.push({
+            id: Math.random().toString(36).substr(2, 9),
+            type: 'low_stock',
+            companyId: 'system',
+            transactionId: product.id,
+            message: `Low stock alert: ${product.name} (Code: ${product.code}) only has ${product.stock} left.`,
+            severity: product.stock === 0 ? 'error' : 'warning',
+            date: new Date().toISOString().split('T')[0],
+            read: false,
+            actionUrl: '/inventory',
+          });
+          changed = true;
+        }
+      }
+    });
+
+    if (changed) {
+      setNotifications(updatedNotifications);
+    }
+  }, [isLoaded, products, transactions, payments]);
+
   const value: DataContextType = {
     companies,
     transactions,
@@ -310,6 +364,11 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
     deleteNotification,
     deleteTransaction,
     deleteReturn,
+    dispatches,
+    setDispatches,
+    addDispatch,
+    updateDispatch,
+    deleteDispatch,
     isLoaded,
   };
 

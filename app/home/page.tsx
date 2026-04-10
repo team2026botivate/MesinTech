@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useData } from '@/lib/data-context';
 import { useAuth } from '@/lib/auth-context';
-import { FileText, Package, RotateCcw, Zap, Users, Archive, DollarSign, Bell, TrendingUp, Settings } from 'lucide-react';
+import { FileText, Package, RotateCcw, Zap, Users, Archive, DollarSign, Bell, TrendingUp, Settings, Truck } from 'lucide-react';
 
 const allModules = [
   {
@@ -45,6 +45,22 @@ const allModules = [
     description: 'Manage customers and suppliers',
     color: 'bg-green-50 border-green-200',
     iconColor: 'text-green-600',
+  },
+  {
+    href: '/customers',
+    label: 'Customers',
+    icon: Users,
+    description: 'Manage customer accounts',
+    color: 'bg-teal-50 border-teal-200',
+    iconColor: 'text-teal-600',
+  },
+  {
+    href: '/dispatch',
+    label: 'Dispatch',
+    icon: Truck,
+    description: 'Track outgoing shipments',
+    color: 'bg-cyan-50 border-cyan-200',
+    iconColor: 'text-cyan-600',
   },
   {
     href: '/inventory',
@@ -93,38 +109,38 @@ export default function HomeGrid() {
     );
   }
 
-  // RBAC Filtering - Now Per-User
   const accessibleModules = allModules.filter(module => 
     user.accessibleModules?.includes(module.href)
   );
 
   return (
-    <>
-      {/* Module Grid */}
-      <h2 className="text-lg font-semibold text-foreground mb-6 flex items-center gap-2">
-        <TrendingUp className="w-5 h-5" />
-        Select a Module
-      </h2>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        {accessibleModules.map((module) => {
-          const Icon = module.icon;
-          return (
-            <Link
-              key={module.href}
-              href={module.href}
-              className={`${module.color} border rounded-lg p-6 transition-all hover:shadow-lg hover:border-opacity-100 cursor-pointer group`}
-            >
-              <div className="flex items-start justify-between mb-4">
-                <div className={`p-3 rounded-xl ${module.color} border border-opacity-50 group-hover:scale-110 transition-transform`}>
-                  <Icon className={`w-8 h-8 ${module.iconColor}`} />
+    <div className="space-y-8">
+      <div>
+        <h2 className="text-lg font-semibold text-foreground mb-6 flex items-center gap-2">
+          <TrendingUp className="w-5 h-5" />
+          Select a Module
+        </h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          {accessibleModules.map((module) => {
+            const Icon = module.icon;
+            return (
+              <Link
+                key={module.href}
+                href={module.href}
+                className={`${module.color} border rounded-lg p-6 transition-all hover:shadow-lg hover:border-opacity-100 cursor-pointer group`}
+              >
+                <div className="flex items-start justify-between mb-4">
+                  <div className={`p-3 rounded-xl ${module.color} border border-opacity-50 group-hover:scale-110 transition-transform`}>
+                    <Icon className={`w-8 h-8 ${module.iconColor}`} />
+                  </div>
                 </div>
-              </div>
-              <h3 className="text-lg font-semibold text-foreground">{module.label}</h3>
-              <p className="text-sm text-muted-foreground mt-2">{module.description}</p>
-            </Link>
-          );
-        })}
+                <h3 className="text-lg font-semibold text-foreground">{module.label}</h3>
+                <p className="text-sm text-muted-foreground mt-2">{module.description}</p>
+              </Link>
+            );
+          })}
+        </div>
       </div>
-    </>
+    </div>
   );
 }

@@ -23,6 +23,9 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Separator } from '@/components/ui/separator';
 
 interface PaymentFormProps {
   transactionId?: string;
@@ -106,7 +109,7 @@ export function PaymentForm({ transactionId, onClose }: PaymentFormProps) {
                 <div className="space-y-2">
                   <Label htmlFor="amount">Amount *</Label>
                   <div className="relative">
-                    <span className="absolute left-3 top-2.5 text-muted-foreground text-sm">$</span>
+                    <span className="absolute left-3 top-2.5 text-muted-foreground text-sm">₹</span>
                     <Input
                       id="amount"
                       type="number"
