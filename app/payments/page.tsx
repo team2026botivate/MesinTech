@@ -16,7 +16,7 @@ export default function PaymentsPage() {
   if (!isLoaded) {
     return (
       <div className="flex h-[80vh] items-center justify-center">
-        <p className="text-muted-foreground animate-pulse">Loading ageing reports...</p>
+        <p className="text-muted-foreground animate-pulse">Loading ageing data...</p>
       </div>
     );
   }

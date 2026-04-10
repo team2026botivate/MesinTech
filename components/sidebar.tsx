@@ -5,7 +5,6 @@ import { usePathname } from 'next/navigation';
 import { useData } from '@/lib/data-context';
 import { useAuth } from '@/lib/auth-context';
 import { 
-  BarChart3, 
   FileText, 
   DollarSign, 
   Users, 
@@ -30,7 +29,6 @@ const navItems = [
   { href: '/inventory', label: 'Inventory', icon: Archive },
   { href: '/payments', label: 'Payments', icon: DollarSign },
   { href: '/notifications', label: 'Notifications', icon: Bell },
-  { href: '/reports', label: 'Reports', icon: BarChart3 },
   { href: '/settings', label: 'Settings', icon: SettingsIcon },
 ];
 

@@ -277,7 +277,7 @@ export const dummyUser: User = {
   password: 'admin123',
   name: 'Admin User',
   role: 'admin',
-  accessibleModules: ['/sales', '/purchases', '/returns', '/expenses', '/companies', '/payments', '/inventory', '/reports', '/notifications', '/settings'],
+  accessibleModules: ['/sales', '/purchases', '/returns', '/expenses', '/companies', '/payments', '/inventory', '/notifications', '/settings'],
 };
 
 export const dummyCredentials = {

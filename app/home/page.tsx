@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useData } from '@/lib/data-context';
 import { useAuth } from '@/lib/auth-context';
-import { FileText, Package, RotateCcw, Zap, Users, Archive, DollarSign, Bell, BarChart3, TrendingUp, Settings } from 'lucide-react';
+import { FileText, Package, RotateCcw, Zap, Users, Archive, DollarSign, Bell, TrendingUp, Settings } from 'lucide-react';
 
 const allModules = [
   {
@@ -58,18 +58,11 @@ const allModules = [
     href: '/payments',
     label: 'Payments',
     icon: DollarSign,
-    description: 'Track payments and aging reports',
+    description: 'Track payments and outstanding balances',
     color: 'bg-emerald-50 border-emerald-200',
     iconColor: 'text-emerald-600',
   },
-  {
-    href: '/reports',
-    label: 'Reports',
-    icon: BarChart3,
-    description: 'View financial reports and analytics',
-    color: 'bg-cyan-50 border-cyan-200',
-    iconColor: 'text-cyan-600',
-  },
+
   {
     href: '/notifications',
     label: 'Notifications',

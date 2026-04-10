@@ -49,7 +49,6 @@ const allModules = [
   { href: '/companies', label: 'Companies' },
   { href: '/inventory', label: 'Inventory' },
   { href: '/payments', label: 'Payments' },
-  { href: '/reports', label: 'Reports' },
   { href: '/notifications', label: 'Notifications' },
   { href: '/settings', label: 'Settings' },
 ];

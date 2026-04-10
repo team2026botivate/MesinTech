@@ -10,7 +10,7 @@ const _geistMono = Geist_Mono({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: 'Mesin Tech - Business Management',
-  description: 'Simple and clean Mesin Tech for managing sales, purchases, and financial reports',
+  description: 'Simple and clean Mesin Tech for managing sales, purchases, and payments',
   generator: 'v0.app',
   icons: {
     icon: [
