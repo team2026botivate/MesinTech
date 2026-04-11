@@ -32,10 +32,12 @@ interface DataContextType {
   updateReturn: (ret: Return) => void;
   updateExpense: (expense: Expense) => void;
   updateProduct: (product: Product) => void;
+  updatePayment: (payment: Payment) => void;
   deleteProduct: (productId: string) => void;
   markNotificationAsRead: (notificationId: string) => void;
   deleteTransaction: (transactionId: string) => void;
   deleteReturn: (returnId: string) => void;
+  deletePayment: (paymentId: string) => void;
   users: User[];
   setUsers: (users: User[]) => void;
   addUser: (user: User) => void;
@@ -117,6 +119,14 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
 
   const addPayment = (payment: Payment) => {
     setPayments([...payments, payment]);
+  };
+
+  const updatePayment = (payment: Payment) => {
+    setPayments(payments.map((p) => (p.id === payment.id ? payment : p)));
+  };
+
+  const deletePayment = (paymentId: string) => {
+    setPayments(payments.filter((p) => p.id !== paymentId));
   };
 
   const addReturn = (ret: Return) => {
@@ -344,6 +354,8 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
     addCompany,
     addTransaction,
     addPayment,
+    updatePayment,
+    deletePayment,
     addReturn,
     addExpense,
     addUser,
