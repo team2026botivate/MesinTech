@@ -57,7 +57,7 @@ export default function PaymentsPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-foreground">Payments & Ageing</h1>
-          <p className="text-sm text-muted-foreground">Track outstanding invoices and payment collection status.</p>
+          <p className="text-sm text-muted-foreground">Track outstanding serials and payment collection status.</p>
         </div>
         <PaymentForm />
       </div>
@@ -75,7 +75,7 @@ export default function PaymentsPage() {
               </div>
             </div>
             <div className="text-[10px] text-muted-foreground bg-muted/50 px-1.5 py-0.5 rounded-full">
-              {transactionsWithBalances.length} invoices
+              {transactionsWithBalances.length} serials
             </div>
           </div>
 
@@ -129,7 +129,7 @@ export default function PaymentsPage() {
               <div className="flex items-center gap-2">
                 <AlertCircle className="w-4 h-4 text-red-500" />
                 <div>
-                  <CardTitle className="text-sm font-bold">Overdue Invoices</CardTitle>
+                  <CardTitle className="text-sm font-bold">Overdue Serials</CardTitle>
                   <CardDescription className="text-[10px]">Exceeded payment terms.</CardDescription>
                 </div>
               </div>
@@ -138,7 +138,7 @@ export default function PaymentsPage() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Invoice</TableHead>
+                    <TableHead>Serial</TableHead>
                     <TableHead>Company</TableHead>
                     <TableHead>Due Date</TableHead>
                     <TableHead>Delay</TableHead>
@@ -148,7 +148,7 @@ export default function PaymentsPage() {
                 <TableBody>
                   {overdueTransactions.map((item) => (
                     <TableRow key={item.transaction.id}>
-                      <TableCell className="font-medium text-red-700">{item.transaction.invoiceNumber}</TableCell>
+                      <TableCell className="font-medium text-red-700">{item.transaction.serialNumber}</TableCell>
                       <TableCell>{item.company.name}</TableCell>
                       <TableCell className="text-muted-foreground">{formatDate(item.dueDate)}</TableCell>
                       <TableCell>
@@ -182,7 +182,7 @@ export default function PaymentsPage() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Invoice</TableHead>
+                    <TableHead>Serial</TableHead>
                     <TableHead>Company</TableHead>
                     <TableHead>Target Date</TableHead>
                     <TableHead>Remaining</TableHead>
@@ -197,7 +197,7 @@ export default function PaymentsPage() {
                     const isWarning = daysUntilDue <= 7;
                     return (
                       <TableRow key={item.transaction.id}>
-                        <TableCell className="font-medium">{item.transaction.invoiceNumber}</TableCell>
+                        <TableCell className="font-medium">{item.transaction.serialNumber}</TableCell>
                         <TableCell>{item.company.name}</TableCell>
                         <TableCell className="text-muted-foreground">{formatDate(item.dueDate)}</TableCell>
                         <TableCell>
@@ -225,7 +225,7 @@ export default function PaymentsPage() {
             <CardContent className="py-8 text-center px-4">
               <CheckCircle className="w-8 h-8 text-emerald-500 mx-auto mb-2 opacity-30" />
               <p className="text-muted-foreground font-bold text-sm">All payments are settled</p>
-              <p className="text-[10px] text-muted-foreground">No outstanding invoices at this time.</p>
+              <p className="text-[10px] text-muted-foreground">No outstanding serials at this time.</p>
             </CardContent>
           </Card>
         )}

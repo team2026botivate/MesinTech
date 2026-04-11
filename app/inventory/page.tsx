@@ -136,7 +136,7 @@ export default function InventoryPage() {
             <div>
               <p className="text-[10px] font-bold text-muted-foreground uppercase opacity-70">Value</p>
               <h3 className="text-lg font-bold leading-tight">
-                {formatCurrency(products.reduce((acc, p) => acc + (p.price * p.stock), 0))}
+                {formatCurrency(products.reduce((acc, p) => acc + ((p.sellingPrice || 0) * p.stock), 0))}
               </h3>
             </div>
           </div>
@@ -210,7 +210,7 @@ export default function InventoryPage() {
                         </div>
                       </TableCell>
                       <TableCell className="text-right">
-                        <span className="font-bold text-sm">{formatCurrency(p.price)}</span>
+                        <span className="font-bold text-sm">{formatCurrency(p.sellingPrice)}</span>
                       </TableCell>
                       <TableCell className="text-right">
                         <div className="flex items-center justify-end gap-2">

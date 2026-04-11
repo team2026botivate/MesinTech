@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -102,7 +102,7 @@ export function ReturnForm({ initialReturn, onSubmit, defaultReturnType = 'sales
       returnType: formData.returnType || defaultReturnType,
       type: formData.returnType === 'sales' ? 'sale' : 'purchase',
       originalTransactionId: formData.originalTransactionId!,
-      originalInvoiceNumber: selectedTransaction?.invoiceNumber,
+      originalSerialNumber: selectedTransaction?.serialNumber,
       companyId: selectedTransaction?.companyId || '',
       companyName: selectedCompany?.name,
       returnDate: formData.returnDate || new Date().toISOString().split('T')[0],
@@ -230,9 +230,10 @@ export function ReturnForm({ initialReturn, onSubmit, defaultReturnType = 'sales
                     <Label htmlFor="returnNumber" className="text-sm font-medium">Return ID</Label>
                     <Input
                       id="returnNumber"
+                      readOnly
                       value={formData.returnNumber || generateReturnNumber(formData.returnType || 'sales')}
                       onChange={(e) => setFormData({ ...formData, returnNumber: e.target.value })}
-                      className="bg-background/50 border-muted-foreground/20"
+                      className="bg-background/20 border-muted-foreground/20 cursor-not-allowed"
                     />
                   </div>
 
@@ -268,7 +269,7 @@ export function ReturnForm({ initialReturn, onSubmit, defaultReturnType = 'sales
 
                   <div className="space-y-2 md:col-span-2">
                     <Label htmlFor="originalTransaction" className="text-sm font-medium">
-                      Select Original {formData.returnType === 'sales' ? 'Invoice' : 'Purchase Order'} <span className="text-destructive">*</span>
+                      Select Original {formData.returnType === 'sales' ? 'Serial' : 'Purchase Serial'} <span className="text-destructive">*</span>
                     </Label>
                     <Select
                       value={formData.originalTransactionId || ''}
@@ -281,7 +282,7 @@ export function ReturnForm({ initialReturn, onSubmit, defaultReturnType = 'sales
                       <SelectContent>
                         {getRelatedTransactions.map((t) => (
                           <SelectItem key={t.id} value={t.id}>
-                            {t.invoiceNumber} - {companies.find(c => c.id === t.companyId)?.name}
+                            {t.serialNumber} - {companies.find(c => c.id === t.companyId)?.name}
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -300,7 +301,7 @@ export function ReturnForm({ initialReturn, onSubmit, defaultReturnType = 'sales
                     <div className="space-y-2">
                       <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Linked To</p>
                       <p className="text-sm font-bold">{selectedCompany?.name}</p>
-                      <p className="text-xs text-muted-foreground">Invoice: {selectedTransaction.invoiceNumber}</p>
+                      <p className="text-xs text-muted-foreground">Serial: {selectedTransaction.serialNumber}</p>
                       <p className="text-xs text-muted-foreground">Original Total: {formatCurrency(selectedTransaction.totalAmount || selectedTransaction.amount)}</p>
                       <Badge variant="outline" className="mt-2 bg-background/50">
                         {selectedTransaction.date}

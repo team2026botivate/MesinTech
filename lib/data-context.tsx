@@ -2,8 +2,8 @@
 
 import React, { createContext, useContext, useEffect } from 'react';
 import { useLocalStorage } from './hooks/use-local-storage';
-import { dummyCompanies, dummyTransactions, dummyPayments, dummyReturns, dummyExpenses, dummyNotifications, dummyUser, dummyProducts, dummyDispatches } from './dummy-data';
-import { Company, Transaction, Payment, Return, Expense, Notification, User, Product, Dispatch } from './types';
+import { dummyCompanies, dummyTransactions, dummyPayments, dummyReturns, dummyExpenses, dummyNotifications, dummyUser, dummyProducts } from './dummy-data';
+import { Company, Transaction, Payment, Return, Expense, Notification, User, Product } from './types';
 
 interface DataContextType {
   companies: Company[];
@@ -41,12 +41,8 @@ interface DataContextType {
   addUser: (user: User) => void;
   updateUser: (user: User) => void;
   deleteUser: (userId: string) => void;
+  resetToDefault: () => void;
   isLoaded: boolean;
-  dispatches: Dispatch[];
-  setDispatches: (dispatches: Dispatch[]) => void;
-  addDispatch: (dispatch: Dispatch) => void;
-  updateDispatch: (dispatch: Dispatch) => void;
-  deleteDispatch: (dispatchId: string) => void;
 }
 
 const DataContext = createContext<DataContextType | undefined>(undefined);
@@ -88,12 +84,8 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
     'erp_products',
     dummyProducts
   );
-  const [dispatches, setDispatchesState, dispatchesLoaded] = useLocalStorage<Dispatch[]>(
-    'erp_dispatches',
-    dummyDispatches
-  );
 
-  const isLoaded = companiesLoaded && transactionsLoaded && paymentsLoaded && returnsLoaded && expensesLoaded && notificationsLoaded && selectedCompanyLoaded && usersLoaded && productsLoaded && dispatchesLoaded;
+  const isLoaded = companiesLoaded && transactionsLoaded && paymentsLoaded && returnsLoaded && expensesLoaded && notificationsLoaded && selectedCompanyLoaded && usersLoaded && productsLoaded;
 
   const setCompanies = (data: Company[]) => setCompaniesState(data);
   const setTransactions = (data: Transaction[]) => setTransactionsState(data);
@@ -101,7 +93,6 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
   const setReturns = (data: Return[]) => setReturnsState(data);
   const setExpenses = (data: Expense[]) => setExpensesState(data);
   const setNotifications = (data: Notification[]) => setNotificationsState(data);
-  const setDispatches = (data: Dispatch[]) => setDispatchesState(data);
 
   const addCompany = (company: Company) => {
     setCompanies([...companies, company]);
@@ -284,18 +275,6 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
     setProductsState(products.filter((p) => p.id !== productId));
   };
 
-  const addDispatch = (dispatch: Dispatch) => {
-    setDispatches([...dispatches, dispatch]);
-  };
-
-  const updateDispatch = (dispatch: Dispatch) => {
-    setDispatches(dispatches.map((d) => (d.id === dispatch.id ? dispatch : d)));
-  };
-
-  const deleteDispatch = (dispatchId: string) => {
-    setDispatches(dispatches.filter((d) => d.id !== dispatchId));
-  };
-
   useEffect(() => {
     if (!isLoaded) return;
     
@@ -327,6 +306,23 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
       setNotifications(updatedNotifications);
     }
   }, [isLoaded, products, transactions, payments]);
+
+  const resetToDefault = () => {
+    const keys = [
+      'erp_companies',
+      'erp_transactions',
+      'erp_payments',
+      'erp_returns',
+      'erp_expenses',
+      'erp_notifications',
+      'erp_selected_company',
+      'erp_users',
+      'erp_products'
+    ];
+    
+    keys.forEach(key => window.localStorage.removeItem(key));
+    window.location.reload();
+  };
 
   const value: DataContextType = {
     companies,
@@ -364,11 +360,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
     deleteNotification,
     deleteTransaction,
     deleteReturn,
-    dispatches,
-    setDispatches,
-    addDispatch,
-    updateDispatch,
-    deleteDispatch,
+    resetToDefault,
     isLoaded,
   };
 

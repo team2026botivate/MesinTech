@@ -48,7 +48,7 @@ export default function NotificationsPage() {
   const getTransactionNumber = (transactionId?: string) => {
     if (!transactionId) return null;
     const transaction = transactions.find((t) => t.id === transactionId);
-    return transaction?.invoiceNumber || null;
+    return transaction?.serialNumber || null;
   };
 
   const severityColors = {

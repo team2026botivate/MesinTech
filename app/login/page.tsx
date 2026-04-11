@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/auth-context';
-import { LogIn, Lock, User, AlertCircle, Loader2 } from 'lucide-react';
+import { LogIn, Lock, User, AlertCircle, Loader2, Eye, EyeOff } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -22,6 +22,7 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
   const { login } = useAuth();
 
@@ -91,14 +92,28 @@ export default function LoginPage() {
                   <Input
                     id="password"
                     name="password"
-                    type="password"
+                    type={showPassword ? 'text' : 'password'}
                     placeholder="Enter your password"
-                    className="pl-9"
+                    className="pl-9 pr-10"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
                     disabled={isLoading}
                   />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent text-muted-foreground transition-colors"
+                    onClick={() => setShowPassword(!showPassword)}
+                    tabIndex={-1}
+                  >
+                    {showPassword ? (
+                      <EyeOff className="h-4 w-4" />
+                    ) : (
+                      <Eye className="h-4 w-4" />
+                    )}
+                  </Button>
                 </div>
               </div>
 
@@ -124,20 +139,36 @@ export default function LoginPage() {
             </form>
           </CardContent>
           <CardFooter className="flex flex-col gap-4 border-t pt-6">
-            <div 
-              className="text-center space-y-1 cursor-pointer group/hint select-none"
-              onClick={() => {
-                setUsername('admin');
-                setPassword('admin123');
-              }}
-              title="Click to autofill"
-            >
-              <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold group-hover/hint:text-primary transition-colors">
-                Demo Environment
-              </p>
-              <p className="text-xs text-muted-foreground group-hover/hint:text-foreground transition-colors">
-                <span className="font-medium">admin</span> / <span className="font-medium">admin123</span>
-              </p>
+            <div className="grid grid-cols-2 gap-4 w-full">
+              <div 
+                className="text-center space-y-1 cursor-pointer group/hint select-none p-2 rounded-lg hover:bg-primary/5 transition-colors border border-transparent hover:border-primary/10"
+                onClick={() => {
+                  setUsername('admin');
+                  setPassword('admin123');
+                }}
+              >
+                <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-bold group-hover/hint:text-primary">
+                  Admin Demo
+                </p>
+                <p className="text-[11px] text-muted-foreground group-hover/hint:text-foreground">
+                  admin / admin123
+                </p>
+              </div>
+
+              <div 
+                className="text-center space-y-1 cursor-pointer group/hint select-none p-2 rounded-lg hover:bg-primary/5 transition-colors border border-transparent hover:border-primary/10"
+                onClick={() => {
+                  setUsername('user');
+                  setPassword('user123');
+                }}
+              >
+                <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-bold group-hover/hint:text-primary">
+                  User Demo
+                </p>
+                <p className="text-[11px] text-muted-foreground group-hover/hint:text-foreground">
+                  user / user123
+                </p>
+              </div>
             </div>
           </CardFooter>
         </Card>

@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useData } from '@/lib/data-context';
 import { useAuth } from '@/lib/auth-context';
-import { FileText, Package, RotateCcw, Zap, Users, Archive, DollarSign, Bell, TrendingUp, Settings, Truck } from 'lucide-react';
+import { FileText, Package, RotateCcw, Zap, Users, Archive, DollarSign, Bell, TrendingUp, Settings, Truck, Building2 } from 'lucide-react';
 
 const allModules = [
   {
@@ -55,20 +55,20 @@ const allModules = [
     iconColor: 'text-teal-600',
   },
   {
-    href: '/dispatch',
-    label: 'Dispatch',
-    icon: Truck,
-    description: 'Track outgoing shipments',
-    color: 'bg-cyan-50 border-cyan-200',
-    iconColor: 'text-cyan-600',
-  },
-  {
     href: '/inventory',
     label: 'Inventory',
     icon: Archive,
     description: 'Manage products and stock levels',
     color: 'bg-indigo-50 border-indigo-200',
     iconColor: 'text-indigo-600',
+  },
+  {
+    href: '/inventory-master',
+    label: 'Inv Master',
+    icon: Building2,
+    description: 'Central Master Data Management',
+    color: 'bg-cyan-50 border-cyan-200',
+    iconColor: 'text-cyan-600',
   },
   {
     href: '/payments',

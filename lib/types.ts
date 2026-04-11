@@ -3,6 +3,7 @@ export type Company = {
   name: string;
   type: 'customer' | 'supplier';
   contactPerson?: string;
+  contactPersonPhone?: string;
   phone: string;
   alternatePhone?: string;
   email?: string;
@@ -24,7 +25,6 @@ export type Company = {
   creditLimit?: number;
   outstandingBalance?: number;
   totalPurchases?: number;
-  preferredDispatchMethod?: string;
   notes?: string;
   ageingBrackets?: {
     bracket1: number; // 0-30 days
@@ -59,7 +59,7 @@ export type LineItem = {
 export type Transaction = {
   id: string;
   type: TransactionType;
-  invoiceNumber: string;
+  serialNumber: string;
   supplierInvoiceNumber?: string;
   companyId: string;
   companyName?: string;
@@ -83,9 +83,6 @@ export type Transaction = {
   date: string;
   dueDate?: string;
   paymentStatus?: 'paid' | 'partial' | 'pending' | 'overdue';
-  dispatchThrough?: string;
-  vehicleNumber?: string;
-  dispatchId?: string;
   notes?: string;
   termsAndConditions?: string;
   createdBy?: string;
@@ -99,7 +96,7 @@ export type Return = {
   type: TransactionType;
   returnType: 'sales' | 'purchase';
   originalTransactionId: string;
-  originalInvoiceNumber?: string;
+  originalSerialNumber?: string;
   companyId: string;
   companyName?: string;
   returnDate: string;
@@ -121,7 +118,6 @@ export type Expense = {
   expenseType: 'courier' | 'travel' | 'food' | 'other';
   expenseDate: string;
   linkedTransactionId?: string;
-  linkedDispatchId?: string;
   companyId?: string;
   amount: number;
   
@@ -204,6 +200,7 @@ export type Product = {
   id: string;
   code: string;
   name: string;
+  size?: string;
   description?: string;
   category: string;
   unit: 'pcs' | 'kg' | 'ltr' | 'box' | 'set' | 'meter' | 'pair';
@@ -219,28 +216,6 @@ export type Product = {
   createdAt?: string;
 };
 
-export type Dispatch = {
-  id: string;
-  dispatchNumber: string;
-  linkedTransactionId: string;
-  linkedInvoiceNumber?: string;
-  companyId: string;
-  companyName?: string;
-  dispatchDate: string;
-  dispatcherName: string;
-  trackingNumber?: string;
-  vehicleNumber?: string;
-  driverName?: string;
-  driverPhone?: string;
-  fromAddress?: string;
-  toAddress?: string;
-  dispatchStatus: 'pending' | 'packed' | 'dispatched' | 'in_transit' | 'out_for_delivery' | 'delivered' | 'failed' | 'returned';
-  expectedDelivery?: string;
-  actualDelivery?: string;
-  deliveryProofUrl?: string;
-  notes?: string;
-  createdAt?: string;
-};
 
 export type StockLedgerEntry = {
   id: string;

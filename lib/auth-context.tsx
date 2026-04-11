@@ -3,7 +3,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { useLocalStorage } from './hooks/use-local-storage';
 import { User } from './types';
-import { dummyUser, dummyCredentials } from './dummy-data';
+import { dummyUser, dummyCredentials, demoUsers } from './dummy-data';
 
 interface AuthContextType {
   user: User | null;
@@ -32,7 +32,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // Simulate API call
     await new Promise((resolve) => setTimeout(resolve, 800));
 
-    // Get users from localStorage to validate login
+    // 1. Check hardcoded demo users (prioritized and bypassing localStorage as requested)
+    const demoUserFound = demoUsers.find(u => u.username === username && u.password === password);
+
+    if (demoUserFound) {
+      const { password, ...userWithoutPassword } = demoUserFound;
+      setUser(userWithoutPassword as User);
+      setIsLoggedIn(true);
+      return true;
+    }
+
+    // 2. Fallback to localStorage for other users
     const storedUsers = localStorage.getItem('erp_users');
     const users: User[] = storedUsers ? JSON.parse(storedUsers) : [dummyUser];
 

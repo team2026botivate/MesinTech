@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -38,7 +38,7 @@ const generateExpenseNumber = () => {
 };
 
 export function ExpenseForm({ initialExpense, onSubmit }: ExpenseFormProps) {
-  const { companies, transactions, dispatches, addExpense, updateExpense } = useData();
+  const { companies, transactions, addExpense, updateExpense } = useData();
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState<Partial<Expense>>(
@@ -82,7 +82,6 @@ export function ExpenseForm({ initialExpense, onSubmit }: ExpenseFormProps) {
         expenseType: formData.expenseType as 'courier' | 'travel' | 'food' | 'other',
         expenseDate: formData.expenseDate || new Date().toISOString().split('T')[0],
         linkedTransactionId: formData.linkedTransactionId,
-        linkedDispatchId: formData.linkedDispatchId,
         companyId: formData.companyId,
         totalExpense: currentTotal,
         amount: formData.amount || 0,
@@ -166,9 +165,10 @@ export function ExpenseForm({ initialExpense, onSubmit }: ExpenseFormProps) {
                     <Label htmlFor="expenseNumber" className="text-xs font-bold uppercase opacity-70">Expense ID</Label>
                     <Input
                       id="expenseNumber"
+                      readOnly
                       value={formData.expenseNumber}
                       onChange={(e) => setFormData({ ...formData, expenseNumber: e.target.value })}
-                      className="bg-background border-muted-foreground/20 h-10"
+                      className="bg-background/20 border-muted-foreground/20 h-10 cursor-not-allowed"
                     />
                   </div>
 
@@ -520,7 +520,7 @@ export function ExpenseForm({ initialExpense, onSubmit }: ExpenseFormProps) {
                   </div>
                   
                   <div className="space-y-2">
-                    <Label htmlFor="linkedTransaction" className="text-xs font-bold uppercase opacity-70">Link to Sales Invoice</Label>
+                    <Label htmlFor="linkedTransaction" className="text-xs font-bold uppercase opacity-70">Link to Sales Serial</Label>
                     <Select
                       value={formData.linkedTransactionId || 'none'}
                       onValueChange={(value) => setFormData({ ...formData, linkedTransactionId: value === 'none' ? undefined : value })}
@@ -532,32 +532,13 @@ export function ExpenseForm({ initialExpense, onSubmit }: ExpenseFormProps) {
                         <SelectItem value="none">None</SelectItem>
                         {salesTransactions.map((t) => (
                           <SelectItem key={t.id} value={t.id}>
-                            {t.invoiceNumber}
+                            {t.serialNumber}
                           </SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
                   </div>
 
-                  <div className="space-y-2">
-                    <Label htmlFor="linkedDispatch" className="text-xs font-bold uppercase opacity-70">Link to Dispatch Record</Label>
-                    <Select
-                      value={formData.linkedDispatchId || 'none'}
-                      onValueChange={(value) => setFormData({ ...formData, linkedDispatchId: value === 'none' ? undefined : value })}
-                    >
-                      <SelectTrigger id="linkedDispatch" className="bg-background h-10">
-                        <SelectValue placeholder="Select dispatch..." />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="none">None</SelectItem>
-                        {dispatches.map((d) => (
-                          <SelectItem key={d.id} value={d.id}>
-                            {d.dispatchNumber}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
                 </div>
               </div>
 

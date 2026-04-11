@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useData } from '@/lib/data-context';
 import { Payment } from '@/lib/types';
 import { Button } from '@/components/ui/button';
@@ -36,7 +36,7 @@ export function PaymentForm({ transactionId, onClose }: PaymentFormProps) {
   const { transactions, addPayment } = useData();
   const [isOpen, setIsOpen] = useState(false);
   const [formData, setFormData] = useState({
-    transactionId: transactionId || '',
+    linkedTransactionId: transactionId || '',
     amount: '',
     date: new Date().toISOString().split('T')[0],
   });
@@ -44,21 +44,26 @@ export function PaymentForm({ transactionId, onClose }: PaymentFormProps) {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!formData.transactionId || !formData.amount) {
+    if (!formData.linkedTransactionId || !formData.amount) {
       alert('Please fill in all required fields');
       return;
     }
 
     const newPayment: Payment = {
       id: `p${Date.now()}`,
-      transactionId: formData.transactionId,
+      linkedTransactionId: formData.linkedTransactionId,
+      companyId: transactions.find(t => t.id === formData.linkedTransactionId)?.companyId || '',
       amount: parseFloat(formData.amount),
-      date: formData.date,
+      paymentDate: formData.date,
+      paymentMode: 'bank_transfer',
+      paymentNumber: `PAY-REC-${Date.now()}`,
+      paymentType: 'received',
+      status: 'completed',
     };
 
     addPayment(newPayment);
     setFormData({
-      transactionId: transactionId || '',
+      linkedTransactionId: transactionId || '',
       amount: '',
       date: new Date().toISOString().split('T')[0],
     });
@@ -87,18 +92,18 @@ export function PaymentForm({ transactionId, onClose }: PaymentFormProps) {
           <ScrollArea className="flex-1 px-6 py-6">
             <div className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="transactionId">Select Invoice / Transaction *</Label>
+                <Label htmlFor="transactionId">Select Serial / Transaction *</Label>
                 <Select
-                  value={formData.transactionId}
-                  onValueChange={(value) => setFormData({ ...formData, transactionId: value })}
+                  value={formData.linkedTransactionId}
+                  onValueChange={(value) => setFormData({ ...formData, linkedTransactionId: value })}
                 >
-                  <SelectTrigger id="transactionId" className="bg-background/50">
+                  <SelectTrigger id="linkedTransactionId" className="bg-background/50">
                     <SelectValue placeholder="Select a transaction" />
                   </SelectTrigger>
                   <SelectContent>
                     {unlinkedTransactions.map((transaction) => (
                       <SelectItem key={transaction.id} value={transaction.id}>
-                        {transaction.invoiceNumber} — {transaction.type.toUpperCase()}
+                        {transaction.serialNumber} — {transaction.type.toUpperCase()}
                       </SelectItem>
                     ))}
                   </SelectContent>

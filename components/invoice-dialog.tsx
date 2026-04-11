@@ -23,10 +23,9 @@ interface InvoiceDialogProps {
 }
 
 export function InvoiceDialog({ transaction, company }: InvoiceDialogProps) {
-  const { products, dispatches } = useData();
+  const { products } = useData();
   const [isOpen, setIsOpen] = useState(false);
 
-  const dispatchInfo = dispatches.find(d => d.transactionId === transaction.id);
 
   const handlePrint = () => {
     // Basic native print dialogue
@@ -43,7 +42,7 @@ export function InvoiceDialog({ transaction, company }: InvoiceDialogProps) {
       </DialogTrigger>
       <DialogContent className="sm:max-w-[750px] bg-background">
         <DialogHeader className="print:hidden">
-          <DialogTitle>Invoice Details</DialogTitle>
+          <DialogTitle>Document Details</DialogTitle>
         </DialogHeader>
 
         {/* This container will be specifically styled for print via global CSS or Tailwind print variants */}
@@ -52,8 +51,8 @@ export function InvoiceDialog({ transaction, company }: InvoiceDialogProps) {
             <CardHeader className="pb-6 mb-6 border-b border-gray-200">
               <div className="flex justify-between items-start">
                 <div>
-                  <CardTitle className="text-3xl font-bold text-gray-800">INVOICE</CardTitle>
-                  <p className="text-sm text-gray-500 mt-1">{transaction.invoiceNumber}</p>
+                  <CardTitle className="text-3xl font-bold text-gray-800">DOCUMENT</CardTitle>
+                  <p className="text-sm text-gray-500 mt-1">{transaction.serialNumber}</p>
                 </div>
                 <div className="text-right">
                   <h3 className="font-semibold text-lg text-gray-800">Mesin Tech</h3>
@@ -71,7 +70,7 @@ export function InvoiceDialog({ transaction, company }: InvoiceDialogProps) {
             </div>
             <div className="text-right">
               <div className="mb-2">
-                <span className="text-sm text-gray-500 font-semibold mr-2">Invoice Date:</span>
+                <span className="text-sm text-gray-500 font-semibold mr-2">Serial Date:</span>
                 <span className="text-sm text-gray-800">{formatDate(transaction.date)}</span>
               </div>
               <div>
@@ -109,9 +108,9 @@ export function InvoiceDialog({ transaction, company }: InvoiceDialogProps) {
               ) : (
                 <TableRow className="text-gray-700">
                   <TableCell>{transaction.description || 'General Item'}</TableCell>
-                  <TableCell className="text-center">{transaction.quantity || 1}</TableCell>
-                  <TableCell className="text-right">{formatCurrency(transaction.amount)}</TableCell>
-                  <TableCell className="text-right">{formatCurrency(transaction.amount)}</TableCell>
+                  <TableCell className="text-center">{1}</TableCell>
+                  <TableCell className="text-right">{formatCurrency(transaction.totalAmount)}</TableCell>
+                  <TableCell className="text-right">{formatCurrency(transaction.totalAmount)}</TableCell>
                 </TableRow>
               )}
             </TableBody>
@@ -119,13 +118,6 @@ export function InvoiceDialog({ transaction, company }: InvoiceDialogProps) {
 
             <div className="flex justify-between items-start border-t pt-6 border-gray-200">
               <div className="w-1/2 pr-6">
-                {dispatchInfo && (
-                  <div className="mb-4">
-                    <p className="text-sm text-gray-500 font-semibold mb-1">DISPATCH INFO:</p>
-                    <p className="text-sm text-gray-700">Via: {dispatchInfo.dispatcherName}</p>
-                    {dispatchInfo.trackingNumber && <p className="text-sm text-gray-700">Tracking: {dispatchInfo.trackingNumber}</p>}
-                  </div>
-                )}
                 {transaction.notes && (
                   <div>
                     <p className="text-sm text-gray-500 font-semibold mb-1">NOTES:</p>
@@ -135,16 +127,28 @@ export function InvoiceDialog({ transaction, company }: InvoiceDialogProps) {
               </div>
               
               <div className="w-1/3">
-                {(transaction.taxRate || transaction.discountAmount) && (
+                {(transaction.totalGst || transaction.discountAmount) && (
                   <div className="flex justify-between mb-2 text-sm">
                     <span className="text-gray-600">Subtotal:</span>
-                    <span className="text-gray-800">{formatCurrency(transaction.amount)}</span>
+                    <span className="text-gray-800">{formatCurrency(transaction.subtotal)}</span>
+                  </div>
+                )}
+                {transaction.discountAmount && (
+                  <div className="flex justify-between mb-2 text-sm">
+                    <span className="text-gray-600">Discount:</span>
+                    <span className="text-emerald-600">-{formatCurrency(transaction.discountAmount)}</span>
+                  </div>
+                )}
+                {transaction.totalGst && (
+                  <div className="flex justify-between mb-2 text-sm">
+                    <span className="text-gray-600">Total GST:</span>
+                    <span className="text-gray-800">{formatCurrency(transaction.totalGst)}</span>
                   </div>
                 )}
                 
                 <div className="flex justify-between items-center py-2 border-t-2 border-gray-800 mt-2">
                   <span className="font-bold text-gray-800">Grand Total:</span>
-                  <span className="font-bold text-gray-900 text-lg">{formatCurrency(transaction.amount)}</span>
+                  <span className="font-bold text-gray-900 text-lg">{formatCurrency(transaction.totalAmount)}</span>
                 </div>
               </div>
             </div>
@@ -154,7 +158,7 @@ export function InvoiceDialog({ transaction, company }: InvoiceDialogProps) {
 
         <div className="flex justify-end gap-3 print:hidden">
           <Button variant="outline" onClick={() => setIsOpen(false)}>Close</Button>
-          <Button onClick={handlePrint}>Print Invoice</Button>
+          <Button onClick={handlePrint}>Print Document</Button>
         </div>
       </DialogContent>
     </Dialog>

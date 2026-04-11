@@ -33,7 +33,7 @@ export default function ReturnsPage() {
 
   const getTransactionInfo = (transactionId: string) => {
     const transaction = transactions.find((t) => t.id === transactionId);
-    return transaction?.invoiceNumber || 'N/A';
+    return transaction?.serialNumber || 'N/A';
   };
 
   const filteredReturns = useMemo(() => {
@@ -57,7 +57,7 @@ export default function ReturnsPage() {
 
   const purchaseReturnsTotal = returns
     .filter((r) => r.returnType === 'purchase')
-    .reduce((sum, r) => sum + (r.refundAmount || 0), 0);
+    .reduce((sum, r) => sum + (r.debitNoteAmount || r.refundAmount || 0), 0);
 
   if (!isLoaded) {
     return (
@@ -192,7 +192,7 @@ export default function ReturnsPage() {
                     <TableRow className="hover:bg-transparent">
                       <TableHead className="font-bold text-xs uppercase tracking-wider py-4">Return ID</TableHead>
                       <TableHead className="font-bold text-xs uppercase tracking-wider py-4">Date</TableHead>
-                      <TableHead className="font-bold text-xs uppercase tracking-wider py-4">Entity & Invoice</TableHead>
+                      <TableHead className="font-bold text-xs uppercase tracking-wider py-4">Entity & Serial</TableHead>
                       <TableHead className="font-bold text-xs uppercase tracking-wider py-4">Reason</TableHead>
                       <TableHead className="font-bold text-xs uppercase tracking-wider py-4">Status</TableHead>
                       <TableHead className="text-right font-bold text-xs uppercase tracking-wider py-4">Amount</TableHead>
@@ -235,7 +235,7 @@ export default function ReturnsPage() {
                           </Badge>
                         </TableCell>
                         <TableCell className="text-right font-black text-sm">
-                          {formatCurrency(ret.refundAmount || 0)}
+                          {formatCurrency(ret.refundAmount || ret.debitNoteAmount || 0)}
                         </TableCell>
                         <TableCell className="text-right">
                           <div className="flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">

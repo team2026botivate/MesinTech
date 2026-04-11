@@ -37,9 +37,9 @@ export default function SalesPage() {
     const transaction = transactions.find((t) => t.id === transactionId);
     if (!transaction) return 0;
     const paid = payments
-      .filter((p) => p.transactionId === transactionId)
+      .filter((p) => p.linkedTransactionId === transactionId)
       .reduce((sum, p) => sum + p.amount, 0);
-    return transaction.amount - paid;
+    return (transaction.totalAmount || 0) - paid;
   };
 
   const getPaymentStatus = (transactionId: string) => {
@@ -54,7 +54,7 @@ export default function SalesPage() {
     return salesTransactions.filter((t) => {
       const matchesSearch =
         searchQuery === '' ||
-        t.invoiceNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        t.serialNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
         getCompanyName(t.companyId).toLowerCase().includes(searchQuery.toLowerCase());
 
       const status = getPaymentStatus(t.id);
@@ -81,7 +81,7 @@ export default function SalesPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-foreground">Sales</h1>
-          <p className="text-sm text-muted-foreground">Manage sales invoices and track customer billing.</p>
+          <p className="text-sm text-muted-foreground">Manage serial numbers and track customer billing.</p>
         </div>
         <TransactionForm type="sale" />
       </div>
@@ -92,7 +92,7 @@ export default function SalesPage() {
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
-              <CardTitle>Sales Invoices</CardTitle>
+              <CardTitle>Sales Serials</CardTitle>
               <CardDescription>A list of all sales transactions and their payment status.</CardDescription>
             </div>
           </div>
@@ -102,7 +102,7 @@ export default function SalesPage() {
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="Search invoices..."
+                placeholder="Search serials..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="pl-9 bg-background/50 border-muted-foreground/20"
@@ -137,14 +137,14 @@ export default function SalesPage() {
 
           {filteredTransactions.length === 0 ? (
             <div className="text-center py-12">
-              <p className="text-muted-foreground">No sales invoices found</p>
+              <p className="text-muted-foreground">No sales serials found</p>
             </div>
           ) : (
             <div className="rounded-md border">
               <Table>
                 <TableHeader className="bg-muted/30">
                   <TableRow className="hover:bg-transparent">
-                    <TableHead className="font-bold text-xs uppercase tracking-wider">Invoice</TableHead>
+                    <TableHead className="font-bold text-xs uppercase tracking-wider">Serial</TableHead>
                     <TableHead className="font-bold text-xs uppercase tracking-wider">Customer</TableHead>
                     <TableHead className="font-bold text-xs uppercase tracking-wider">Date</TableHead>
                     <TableHead className="text-right font-bold text-xs uppercase tracking-wider">Amount</TableHead>
@@ -158,16 +158,16 @@ export default function SalesPage() {
                   {filteredTransactions.map((transaction) => {
                     const status = getPaymentStatus(transaction.id);
                     const paidAmount = payments
-                      .filter((p) => p.transactionId === transaction.id)
+                      .filter((p) => p.linkedTransactionId === transaction.id)
                       .reduce((sum, p) => sum + p.amount, 0);
                     
                     return (
                       <TableRow key={transaction.id}>
-                        <TableCell className="font-medium">{transaction.invoiceNumber}</TableCell>
+                        <TableCell className="font-medium">{transaction.serialNumber}</TableCell>
                         <TableCell>{getCompanyName(transaction.companyId)}</TableCell>
                         <TableCell className="text-muted-foreground">{formatDate(transaction.date)}</TableCell>
                         <TableCell className="text-right font-medium">
-                          {formatCurrency(transaction.amount)}
+                          {formatCurrency(transaction.totalAmount)}
                         </TableCell>
                         <TableCell className="text-right text-muted-foreground">
                           {formatCurrency(paidAmount)}

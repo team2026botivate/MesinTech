@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useData } from '@/lib/data-context';
 import { Transaction, TransactionType, LineItem, Company } from '@/lib/types';
 import { Button } from '@/components/ui/button';
@@ -47,9 +47,9 @@ interface TransactionFormProps {
   onClose?: () => void;
 }
 
-const generateInvoiceNumber = (type: TransactionType) => {
+const generateSerialNumber = (type: TransactionType) => {
   const year = new Date().getFullYear();
-  const prefix = type === 'sale' ? 'INV' : 'PUR';
+  const prefix = 'SR';
   const randomNum = Math.floor(Math.random() * 9000) + 1000;
   return `${prefix}-${year}-${randomNum}`;
 };
@@ -61,13 +61,11 @@ export function TransactionForm({ type, onClose }: TransactionFormProps) {
   const [formData, setFormData] = useState({
     companyId: '',
     date: new Date().toISOString().split('T')[0],
-    invoiceNumber: generateInvoiceNumber(type),
+    serialNumber: generateSerialNumber(type),
     supplierInvoiceNumber: '',
     description: '',
-    dispatchThrough: '',
     dueDate: '',
     billingAddress: '',
-    vehicleNumber: '',
     discountType: 'fixed' as 'percentage' | 'fixed',
     discountValue: 0,
   });
@@ -195,7 +193,7 @@ export function TransactionForm({ type, onClose }: TransactionFormProps) {
     const newTransaction: Transaction = {
       id: `t${Date.now()}`,
       type,
-      invoiceNumber: formData.invoiceNumber,
+      serialNumber: formData.serialNumber,
       supplierInvoiceNumber: formData.supplierInvoiceNumber || undefined,
       companyId: formData.companyId,
       companyName: selectedCompany?.name,
@@ -219,8 +217,6 @@ export function TransactionForm({ type, onClose }: TransactionFormProps) {
       date: formData.date,
       dueDate: formData.dueDate,
       paymentStatus: 'pending',
-      dispatchThrough: formData.dispatchThrough || undefined,
-      vehicleNumber: formData.vehicleNumber || undefined,
       notes: formData.description || undefined,
       status: 'confirmed',
     };
@@ -231,13 +227,11 @@ export function TransactionForm({ type, onClose }: TransactionFormProps) {
     setFormData({
       companyId: '',
       date: new Date().toISOString().split('T')[0],
-      invoiceNumber: generateInvoiceNumber(type),
+      serialNumber: generateSerialNumber(type),
       supplierInvoiceNumber: '',
       description: '',
-      dispatchThrough: '',
       dueDate: '',
       billingAddress: '',
-      vehicleNumber: '',
       discountType: 'fixed',
       discountValue: 0,
     });
@@ -261,7 +255,7 @@ export function TransactionForm({ type, onClose }: TransactionFormProps) {
       <DialogContent className="sm:max-w-5xl max-h-[95vh] flex flex-col p-0 overflow-hidden">
         <DialogHeader className="px-6 py-4 border-b">
           <DialogTitle className="text-xl font-bold tracking-tight">
-            Create {type === 'sale' ? 'Sales Invoice' : 'Purchase Order'}
+            Create {type === 'sale' ? 'Sales Serial' : 'Purchase Order'}
           </DialogTitle>
         </DialogHeader>
         
@@ -297,14 +291,15 @@ export function TransactionForm({ type, onClose }: TransactionFormProps) {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="invoiceNumber" className="text-sm font-medium">Invoice Number <span className="text-destructive">*</span></Label>
+                    <Label htmlFor="serialNumber" className="text-sm font-medium">Serial Number <span className="text-destructive">*</span></Label>
                     <Input
-                      id="invoiceNumber"
+                      id="serialNumber"
                       required
-                      placeholder={type === 'sale' ? 'INV-2025-0001' : 'PUR-2025-0001'}
-                      value={formData.invoiceNumber}
-                      onChange={(e) => setFormData({ ...formData, invoiceNumber: e.target.value })}
-                      className="bg-background/50 border-muted-foreground/20"
+                      readOnly
+                      placeholder="SR-2025-0001"
+                      value={formData.serialNumber}
+                      onChange={(e) => setFormData({ ...formData, serialNumber: e.target.value })}
+                      className="bg-background/20 border-muted-foreground/20 cursor-not-allowed"
                     />
                   </div>
 
@@ -347,34 +342,6 @@ export function TransactionForm({ type, onClose }: TransactionFormProps) {
                 </div>
               </div>
 
-              <div className="space-y-4">
-                <div className="flex items-center gap-2 mb-2">
-                  <div className="h-4 w-1 bg-primary rounded-full" />
-                  <h3 className="text-sm font-bold text-foreground uppercase tracking-tight">Logistics</h3>
-                </div>
-                <div className="space-y-4 p-4 rounded-xl border border-muted-foreground/10 bg-muted/5">
-                  <div className="space-y-2">
-                    <Label htmlFor="dispatchThrough" className="text-sm font-medium">Dispatch Through</Label>
-                    <Input
-                      id="dispatchThrough"
-                      placeholder="e.g., DHL, FedEx, Transport"
-                      value={formData.dispatchThrough}
-                      onChange={(e) => setFormData({ ...formData, dispatchThrough: e.target.value })}
-                      className="bg-background/50 border-muted-foreground/20"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="vehicleNumber" className="text-sm font-medium">Vehicle Number</Label>
-                    <Input
-                      id="vehicleNumber"
-                      placeholder="MH12AB3456"
-                      value={formData.vehicleNumber}
-                      onChange={(e) => setFormData({ ...formData, vehicleNumber: e.target.value })}
-                      className="bg-background/50 border-muted-foreground/20"
-                    />
-                  </div>
-                </div>
-              </div>
             </div>
 
             <Separator className="opacity-50" />
@@ -648,7 +615,7 @@ export function TransactionForm({ type, onClose }: TransactionFormProps) {
             </Button>
             <Button type="submit" className="shadow-sm px-8">
               <Save className="w-4 h-4 mr-2" />
-              Generate Invoice
+              Generate Serial
             </Button>
           </DialogFooter>
         </form>

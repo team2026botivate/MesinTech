@@ -27,9 +27,9 @@ export default function PurchasesPage() {
     const transaction = transactions.find((t) => t.id === transactionId);
     if (!transaction) return 0;
     const paid = payments
-      .filter((p) => p.transactionId === transactionId)
+      .filter((p) => p.linkedTransactionId === transactionId)
       .reduce((sum, p) => sum + p.amount, 0);
-    return transaction.amount - paid;
+    return (transaction.totalAmount || 0) - paid;
   };
 
   return (
@@ -56,7 +56,7 @@ export default function PurchasesPage() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Order No.</TableHead>
+                  <TableHead>Serial No.</TableHead>
                   <TableHead>Supplier</TableHead>
                   <TableHead>Date</TableHead>
                   <TableHead className="text-right">Amount</TableHead>
@@ -67,16 +67,16 @@ export default function PurchasesPage() {
               <TableBody>
                 {purchaseTransactions.map((transaction) => (
                   <TableRow key={transaction.id}>
-                    <TableCell className="font-medium text-foreground">{transaction.invoiceNumber}</TableCell>
+                    <TableCell className="font-medium text-foreground">{transaction.serialNumber}</TableCell>
                     <TableCell>{getCompanyName(transaction.companyId)}</TableCell>
                     <TableCell className="text-muted-foreground">{formatDate(transaction.date)}</TableCell>
                     <TableCell className="text-right font-medium text-foreground">
-                      {formatCurrency(transaction.amount)}
+                      {formatCurrency(transaction.totalAmount)}
                     </TableCell>
                     <TableCell className="text-right text-muted-foreground">
                       {formatCurrency(
                         payments
-                          .filter((p) => p.transactionId === transaction.id)
+                          .filter((p) => p.linkedTransactionId === transaction.id)
                           .reduce((sum, p) => sum + p.amount, 0)
                       )}
                     </TableCell>

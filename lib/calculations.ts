@@ -10,7 +10,7 @@ export function getRemainingBalance(transaction: Transaction, payments: Payment[
   const paidAmount = payments
     .filter((p) => p.transactionId === transaction.id)
     .reduce((sum, p) => sum + p.amount, 0);
-  return transaction.amount - paidAmount;
+  return (transaction.totalAmount || 0) - paidAmount;
 }
 
 export function isOverdue(transaction: Transaction, company: Company): boolean {
@@ -40,13 +40,13 @@ export function calculateDelayLoss(transaction: Transaction, company: Company, p
 export function calculateReturnImpact(returns: Return[], transactionType: 'sale' | 'purchase'): number {
   return returns
     .filter((r) => r.type === transactionType && r.status === 'approved')
-    .reduce((sum, r) => sum + r.amount, 0);
+    .reduce((sum, r) => sum + (r.refundAmount || r.debitNoteAmount || 0), 0);
 }
 
 export function calculateApprovedExpenses(expenses: Expense[]): number {
   return expenses
     .filter((e) => e.status === 'approved')
-    .reduce((sum, e) => sum + e.amount, 0);
+    .reduce((sum, e) => sum + (e.totalExpense || e.amount || 0), 0);
 }
 
 export function calculatePLView(
@@ -59,8 +59,8 @@ export function calculatePLView(
   const sales = transactions.filter((t) => t.type === 'sale');
   const purchases = transactions.filter((t) => t.type === 'purchase');
 
-  const totalSales = sales.reduce((sum, t) => sum + t.amount, 0);
-  const totalPurchases = purchases.reduce((sum, t) => sum + t.amount, 0);
+  const totalSales = sales.reduce((sum, t) => sum + (t.totalAmount || 0), 0);
+  const totalPurchases = purchases.reduce((sum, t) => sum + (t.totalAmount || 0), 0);
   
   // Apply returns/adjustments
   const salesReturns = calculateReturnImpact(returns, 'sale');
