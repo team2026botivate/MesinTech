@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useData } from '@/lib/data-context';
 import { useAuth } from '@/lib/auth-context';
-import { FileText, Package, RotateCcw, Zap, Users, Archive, DollarSign, Bell, TrendingUp, Settings, Truck, Building2 } from 'lucide-react';
+import { FileText, Package, RotateCcw, Zap, Users, Archive, DollarSign, Bell, TrendingUp, Settings, Truck, Building2, BarChart3 } from 'lucide-react';
 
 const allModules = [
   {
@@ -13,6 +13,14 @@ const allModules = [
     description: 'Create and manage sales invoices',
     color: 'bg-blue-50 border-blue-200',
     iconColor: 'text-blue-600',
+  },
+  {
+    href: '/pnl',
+    label: 'Profit & Loss',
+    icon: BarChart3,
+    description: 'Track profit, loss and payment analytics',
+    color: 'bg-green-50 border-green-200',
+    iconColor: 'text-green-600',
   },
   {
     href: '/purchases',
