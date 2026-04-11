@@ -54,21 +54,19 @@ import { User } from '@/lib/types';
 
 const allModules = [
   { href: '/home', label: 'Dashboard', icon: 'LayoutDashboard' },
+  { href: '/pnl', label: 'Profit & Loss', icon: 'TrendingUp' },
   { href: '/sales', label: 'Sales', icon: 'FileText' },
   { href: '/purchases', label: 'Purchases', icon: 'Package' },
   { href: '/returns', label: 'Returns', icon: 'RotateCcw' },
   { href: '/expenses', label: 'Expenses', icon: 'Zap' },
-  { href: '/companies', label: 'Companies', icon: 'Building2' },
-  { href: '/customers', label: 'Customers', icon: 'Users' },
-  { href: '/inventory', label: 'Inventory', icon: 'Archive' },
-  { href: '/inventory-master', label: 'Inventory Master', icon: 'Building2' },
+  { href: '/master', label: 'Master', icon: 'Building2' },
   { href: '/payments', label: 'Payments', icon: 'DollarSign' },
   { href: '/notifications', label: 'Notifications', icon: 'Bell' },
   { href: '/settings', label: 'Settings', icon: 'Settings' },
 ];
 
 export default function SettingsPage() {
-  const { users, addUser, updateUser, deleteUser, resetToDefault, isLoaded } = useData();
+  const { users, addUser, updateUser, deleteUser, isLoaded } = useData();
   const { user: currentUser, updateSessionUser } = useAuth();
   
   const [userSearch, setUserSearch] = useState('');
@@ -107,7 +105,7 @@ export default function SettingsPage() {
       username: '', 
       password: '', 
       role: 'user',
-      accessibleModules: ['/home', '/sales', '/companies'] // Default set for new users
+      accessibleModules: ['/home', '/sales', '/master'] // Default set for new users
     });
     setIsUserModalOpen(true);
   };
@@ -288,38 +286,6 @@ export default function SettingsPage() {
                 )}
               </TableBody>
             </Table>
-          </div>
-        </CardContent>
-      </Card>
-      
-      <Card className="border-destructive/20 bg-destructive/5">
-        <CardHeader>
-          <CardTitle className="text-destructive flex items-center gap-2">
-            <Zap className="w-5 h-5" />
-            Data Management
-          </CardTitle>
-          <CardDescription>
-            System-level data operations. These actions are permanent and cannot be undone.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex items-center justify-between p-4 rounded-xl border border-destructive/10 bg-background/50">
-            <div className="space-y-1">
-              <h4 className="text-sm font-bold uppercase tracking-tight">Reset to Factory Defaults</h4>
-              <p className="text-xs text-muted-foreground">
-                Clears all your local changes and seeds the system with the latest industrial ERP dummy data.
-              </p>
-            </div>
-            <Button 
-              variant="destructive" 
-              onClick={() => {
-                if (confirm('CAUTION: This will delete all your local transactions, companies, and settings. The system will reload with fresh dummy data. Proceed?')) {
-                  resetToDefault();
-                }
-              }}
-            >
-              Reset System Data
-            </Button>
           </div>
         </CardContent>
       </Card>

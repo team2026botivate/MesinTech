@@ -26,6 +26,8 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
+import { formatCurrency, formatDate } from '@/lib/format';
+import { getRemainingBalance } from '@/lib/calculations';
 
 interface PaymentFormProps {
   transactionId?: string;
@@ -33,13 +35,17 @@ interface PaymentFormProps {
 }
 
 export function PaymentForm({ transactionId, onClose }: PaymentFormProps) {
-  const { transactions, addPayment } = useData();
+  const { transactions, companies, payments, addPayment } = useData();
   const [isOpen, setIsOpen] = useState(false);
   const [formData, setFormData] = useState({
     linkedTransactionId: transactionId || '',
     amount: '',
     date: new Date().toISOString().split('T')[0],
   });
+
+  const selectedTransaction = transactions.find(t => t.id === formData.linkedTransactionId);
+  const company = selectedTransaction ? companies.find(c => c.id === selectedTransaction.companyId) : null;
+  const remainingBalance = selectedTransaction ? getRemainingBalance(selectedTransaction, payments) : 0;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -108,6 +114,46 @@ export function PaymentForm({ transactionId, onClose }: PaymentFormProps) {
                     ))}
                   </SelectContent>
                 </Select>
+
+                {selectedTransaction && (
+                  <Card className="mt-4 bg-muted/30 border-muted">
+                    <CardContent className="p-4 space-y-3">
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm font-medium">Company</span>
+                        <span className="text-sm text-muted-foreground">{company?.name || '-'}</span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm font-medium">Type</span>
+                        <Badge variant={selectedTransaction.type === 'sale' ? 'default' : 'secondary'}>
+                          {selectedTransaction.type.toUpperCase()}
+                        </Badge>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm font-medium">Total Amount</span>
+                        <span className="text-sm font-semibold">{formatCurrency(selectedTransaction.totalAmount)}</span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm font-medium">Amount Paid</span>
+                        <span className="text-sm text-muted-foreground">{formatCurrency(selectedTransaction.amountPaid)}</span>
+                      </div>
+                      <Separator />
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm font-bold">Remaining Balance</span>
+                        <span className="text-sm font-bold text-primary">{formatCurrency(remainingBalance)}</span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm font-medium">Date</span>
+                        <span className="text-sm text-muted-foreground">{formatDate(selectedTransaction.date)}</span>
+                      </div>
+                      {selectedTransaction.dueDate && (
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm font-medium">Due Date</span>
+                          <span className="text-sm text-muted-foreground">{formatDate(selectedTransaction.dueDate)}</span>
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                )}
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

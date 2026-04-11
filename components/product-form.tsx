@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Product } from '@/lib/types';
+import { useData } from '@/lib/data-context';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -48,8 +49,13 @@ const categoriesList = [
 const gstRates = [0, 5, 12, 18, 28];
 
 export function ProductForm({ product, onSubmit, onCancel, open, onOpenChange }: ProductFormProps) {
+  const { companies } = useData();
+  const vendors = companies.filter(c => c.type === 'supplier');
+
   const [formData, setFormData] = useState({
     name: '',
+    vendorId: '',
+    vendorName: '',
     size: '',
     description: '',
     sellingPrice: 0,
@@ -69,6 +75,8 @@ export function ProductForm({ product, onSubmit, onCancel, open, onOpenChange }:
     if (product && open) {
       setFormData({
         name: product.name,
+        vendorId: product.vendorId || '',
+        vendorName: product.vendorName || '',
         size: product.size || '',
         description: product.description || '',
         sellingPrice: product.sellingPrice,
@@ -86,6 +94,8 @@ export function ProductForm({ product, onSubmit, onCancel, open, onOpenChange }:
     } else if (open) {
       setFormData({
         name: '',
+        vendorId: '',
+        vendorName: '',
         size: '',
         description: '',
         sellingPrice: 0,
@@ -140,6 +150,31 @@ export function ProductForm({ product, onSubmit, onCancel, open, onOpenChange }:
                       required
                       className="bg-background border-muted-foreground/20 h-10"
                     />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="vendor" className="text-xs font-bold uppercase opacity-70">Primary Vendor *</Label>
+                    <Select 
+                      value={formData.vendorId} 
+                      onValueChange={(value) => {
+                        const vendor = vendors.find(v => v.id === value);
+                        setFormData({ 
+                          ...formData, 
+                          vendorId: value, 
+                          vendorName: vendor ? vendor.name : '' 
+                        });
+                      }}
+                      required
+                    >
+                      <SelectTrigger className={`bg-background border-muted-foreground/20 h-10 ${!formData.vendorId ? 'text-muted-foreground' : ''}`}>
+                        <SelectValue placeholder="Select vendor" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {vendors.map((v) => (
+                          <SelectItem key={v.id} value={v.id}>{v.name}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
 
                   <div className="space-y-2">

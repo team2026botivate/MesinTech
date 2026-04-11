@@ -16,7 +16,8 @@ import {
   Bell,
   Settings as SettingsIcon,
   Truck,
-  Building2
+  Building2,
+  TrendingUp
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
@@ -24,14 +25,12 @@ import { cn } from '@/lib/utils';
 
 const navItems = [
   { href: '/home', label: 'Home', icon: Home },
+  { href: '/pnl', label: 'Profit & Loss', icon: TrendingUp },
   { href: '/sales', label: 'Sales', icon: FileText },
   { href: '/purchases', label: 'Purchases', icon: Package },
   { href: '/returns', label: 'Returns', icon: RotateCcw },
   { href: '/expenses', label: 'Expenses', icon: Zap },
-  { href: '/companies', label: 'Companies', icon: Building2 },
-  { href: '/customers', label: 'Customers', icon: Users },
-  { href: '/inventory', label: 'Inventory', icon: Archive },
-  { href: '/inventory-master', label: 'Inv Master', icon: Building2 },
+  { href: '/master', label: 'Master', icon: Building2 },
   { href: '/payments', label: 'Payments', icon: DollarSign },
   { href: '/notifications', label: 'Notifications', icon: Bell },
   { href: '/settings', label: 'Settings', icon: SettingsIcon },

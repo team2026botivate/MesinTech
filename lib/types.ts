@@ -200,6 +200,8 @@ export type Product = {
   id: string;
   code: string;
   name: string;
+  vendorId?: string;
+  vendorName?: string;
   size?: string;
   description?: string;
   category: string;

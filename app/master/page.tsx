@@ -99,54 +99,54 @@ export default function InventoryMasterPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight text-foreground">Inventory Master</h1>
-          <p className="text-sm text-muted-foreground">Manage products, vendors, and customers in one place.</p>
-        </div>
-        <div className="flex items-center gap-3">
-          {activeTab === 'products' && (
-            <Button onClick={() => { setEditingProduct(null); setIsProductModalOpen(true); }} className="flex items-center gap-2">
-              <Plus className="w-4 h-4" />
-              Add Product
-            </Button>
-          )}
-          {activeTab === 'vendors' && (
-            <CompanyForm defaultType="supplier" />
-          )}
-          {activeTab === 'customers' && (
-            <CompanyForm defaultType="customer" />
-          )}
-        </div>
-      </div>
-
       <Card>
-        <CardHeader>
+        <CardHeader className="pb-4">
           <div className="flex items-center justify-between">
-            <div>
-              <CardTitle>Master Database</CardTitle>
-              <CardDescription>Centralized management of your products, vendors, and customers.</CardDescription>
-            </div>
+            <CardTitle>Master Database</CardTitle>
           </div>
         </CardHeader>
         <CardContent>
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
-            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-fit">
-              <TabsList className="bg-muted/50 border">
-                <TabsTrigger value="products" className="data-[state=active]:bg-background">
-                  <Package className="w-4 h-4 mr-2" />
-                  Products
-                </TabsTrigger>
-                <TabsTrigger value="vendors" className="data-[state=active]:bg-background">
-                  <Building2 className="w-4 h-4 mr-2" />
-                  Vendors
-                </TabsTrigger>
-                <TabsTrigger value="customers" className="data-[state=active]:bg-background">
-                  <Users className="w-4 h-4 mr-2" />
-                  Customers
-                </TabsTrigger>
-              </TabsList>
-            </Tabs>
+            <div className="flex items-center gap-3">
+              <Tabs value={activeTab} onValueChange={setActiveTab} className="w-fit">
+                <TabsList className="bg-muted/50 border">
+                  <TabsTrigger value="products" className="data-[state=active]:bg-background">
+                    <Package className="w-4 h-4 mr-2" />
+                    Products
+                  </TabsTrigger>
+                  <TabsTrigger value="vendors" className="data-[state=active]:bg-background">
+                    <Building2 className="w-4 h-4 mr-2" />
+                    Vendors
+                  </TabsTrigger>
+                  <TabsTrigger value="customers" className="data-[state=active]:bg-background">
+                    <Users className="w-4 h-4 mr-2" />
+                    Customers
+                  </TabsTrigger>
+                </TabsList>
+              </Tabs>
+              {activeTab === 'products' && (
+                <Button onClick={() => { setEditingProduct(null); setIsProductModalOpen(true); }} className="flex items-center gap-2">
+                  <Plus className="w-4 h-4" />
+                  Add Product
+                </Button>
+              )}
+              {activeTab === 'vendors' && (
+                <CompanyForm defaultType="supplier" trigger={
+                  <Button className="flex items-center gap-2">
+                    <Plus className="w-4 h-4" />
+                    Add Vendor
+                  </Button>
+                } />
+              )}
+              {activeTab === 'customers' && (
+                <CompanyForm defaultType="customer" trigger={
+                  <Button className="flex items-center gap-2">
+                    <Plus className="w-4 h-4" />
+                    Add Customer
+                  </Button>
+                } />
+              )}
+            </div>
             <div className="relative w-full md:w-72">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
@@ -184,7 +184,8 @@ export default function InventoryMasterPage() {
                               </Badge>
                             </span>
                             <span className="text-xs text-muted-foreground mt-0.5 line-clamp-1 opacity-70">
-                              {p.hsnCode ? `HSN: ${p.hsnCode}` : 'No HSN Code'}
+                              {p.hsnCode ? `HSN: ${p.hsnCode}` : 'No HSN Code'} 
+                              {p.vendorName && ` • ${p.vendorName}`}
                             </span>
                           </div>
                         </TableCell>

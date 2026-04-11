@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useEffect } from 'react';
 import { useLocalStorage } from './hooks/use-local-storage';
-import { dummyCompanies, dummyTransactions, dummyPayments, dummyReturns, dummyExpenses, dummyNotifications, dummyUser, dummyProducts } from './dummy-data';
+import { dummyCompanies, dummyTransactions, dummyPayments, dummyReturns, dummyExpenses, dummyNotifications, dummyUser, dummyProducts, demoUsers } from './dummy-data';
 import { Company, Transaction, Payment, Return, Expense, Notification, User, Product } from './types';
 
 interface DataContextType {
@@ -78,7 +78,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
   );
   const [users, setUsersState, usersLoaded] = useLocalStorage<User[]>(
     'erp_users',
-    [dummyUser]
+    demoUsers
   );
   const [products, setProductsState, productsLoaded] = useLocalStorage<Product[]>(
     'erp_products',
@@ -295,7 +295,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
             severity: product.stock === 0 ? 'error' : 'warning',
             date: new Date().toISOString().split('T')[0],
             read: false,
-            actionUrl: '/inventory',
+            actionUrl: '/master',
           });
           changed = true;
         }
