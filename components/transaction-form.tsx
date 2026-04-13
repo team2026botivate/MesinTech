@@ -3,7 +3,7 @@ import { useData } from '@/lib/data-context';
 import { Transaction, TransactionType, LineItem, Company } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Plus, Trash2, Tag, Percent, Calculator, FileText, Save } from 'lucide-react';
+import { Plus, Trash2, Tag, Percent, Calculator, FileText, Save, Eye } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -41,10 +41,12 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover';
 import { Calendar } from '@/components/ui/calendar';
+import { InvoiceDialog } from '@/components/invoice-dialog';
 
 interface TransactionFormProps {
   type: TransactionType;
   onClose?: () => void;
+  editTransaction?: Transaction | null;
 }
 
 const generateSerialNumber = (type: TransactionType) => {
@@ -54,9 +56,10 @@ const generateSerialNumber = (type: TransactionType) => {
   return `${prefix}-${year}-${randomNum}`;
 };
 
-export function TransactionForm({ type, onClose }: TransactionFormProps) {
-  const { companies, products, addTransaction } = useData();
+export function TransactionForm({ type, onClose, editTransaction }: TransactionFormProps) {
+  const { companies, products, addTransaction, updateTransaction } = useData();
   const [isOpen, setIsOpen] = useState(false);
+  const [showInvoiceDialog, setShowInvoiceDialog] = useState(false);
   
   const [formData, setFormData] = useState({
     companyId: '',
@@ -68,6 +71,9 @@ export function TransactionForm({ type, onClose }: TransactionFormProps) {
     billingAddress: '',
     discountType: 'fixed' as 'percentage' | 'fixed',
     discountValue: 0,
+    paymentMethod: 'bill' as 'cash' | 'bill',
+    cashSerialNumber: '',
+    billSerialNumber: '',
   });
 
   const [items, setItems] = useState<LineItem[]>([
@@ -131,6 +137,41 @@ export function TransactionForm({ type, onClose }: TransactionFormProps) {
     }
   }, [selectedCompany]);
 
+  useEffect(() => {
+    if (editTransaction) {
+      setFormData({
+        companyId: editTransaction.companyId || '',
+        date: editTransaction.date || new Date().toISOString().split('T')[0],
+        serialNumber: editTransaction.serialNumber || generateSerialNumber(type),
+        supplierInvoiceNumber: editTransaction.supplierInvoiceNumber || '',
+        description: editTransaction.description || '',
+        dueDate: editTransaction.dueDate || '',
+        billingAddress: editTransaction.billingAddress || '',
+        discountType: editTransaction.discountType || 'fixed',
+        discountValue: editTransaction.discountValue || 0,
+        paymentMethod: editTransaction.paymentMethod || 'bill',
+        cashSerialNumber: editTransaction.cashSerialNumber || '',
+        billSerialNumber: editTransaction.billSerialNumber || '',
+      });
+      setItems(editTransaction.lineItems || [{ id: '1', productId: '', description: '', quantity: 1, unit: 'pcs', unitPrice: 0, gstRate: 18, lineTotal: 0 }]);
+    } else {
+      setFormData(prev => ({
+        ...prev,
+        serialNumber: generateSerialNumber(type),
+        paymentMethod: 'bill',
+        cashSerialNumber: '',
+        billSerialNumber: '',
+      }));
+      setItems([{ id: '1', productId: '', description: '', quantity: 1, unit: 'pcs', unitPrice: 0, gstRate: 18, lineTotal: 0 }]);
+    }
+  }, [editTransaction, type]);
+
+  useEffect(() => {
+    if (editTransaction) {
+      setIsOpen(true);
+    }
+  }, [editTransaction]);
+
   const addItem = () => {
     setItems([
       ...items,
@@ -190,8 +231,8 @@ export function TransactionForm({ type, onClose }: TransactionFormProps) {
       igst: 0,
     }));
 
-    const newTransaction: Transaction = {
-      id: `t${Date.now()}`,
+    const transactionData: Transaction = {
+      id: editTransaction ? editTransaction.id : `t${Date.now()}`,
       type,
       serialNumber: formData.serialNumber,
       supplierInvoiceNumber: formData.supplierInvoiceNumber || undefined,
@@ -211,18 +252,26 @@ export function TransactionForm({ type, onClose }: TransactionFormProps) {
       igstAmount: gstCalculations.igst,
       totalGst: gstCalculations.totalGst,
       totalAmount,
-      amountPaid: 0,
-      balanceDue: totalAmount,
+      amountPaid: editTransaction ? editTransaction.amountPaid : 0,
+      balanceDue: editTransaction ? editTransaction.balanceDue : totalAmount,
       amountInWords,
       date: formData.date,
       dueDate: formData.dueDate,
-      paymentStatus: 'pending',
+      paymentStatus: editTransaction ? editTransaction.paymentStatus : 'pending',
       notes: formData.description || undefined,
       status: 'confirmed',
+      paymentMethod: formData.paymentMethod,
+      cashSerialNumber: formData.paymentMethod === 'cash' ? formData.cashSerialNumber : undefined,
+      billSerialNumber: formData.paymentMethod === 'bill' ? formData.billSerialNumber : undefined,
     };
 
-    addTransaction(newTransaction);
-    toast.success(`${type === 'sale' ? 'Sale' : 'Purchase'} invoice created successfully`);
+    if (editTransaction) {
+      updateTransaction(transactionData);
+      toast.success(`${type === 'sale' ? 'Sale' : 'Purchase'} updated successfully`);
+    } else {
+      addTransaction(transactionData);
+      toast.success(`${type === 'sale' ? 'Sale' : 'Purchase'} invoice created successfully`);
+    }
     
     setFormData({
       companyId: '',
@@ -234,6 +283,9 @@ export function TransactionForm({ type, onClose }: TransactionFormProps) {
       billingAddress: '',
       discountType: 'fixed',
       discountValue: 0,
+      paymentMethod: 'bill',
+      cashSerialNumber: '',
+      billSerialNumber: '',
     });
     setItems([{ id: '1', productId: '', description: '', quantity: 1, unit: 'pcs', unitPrice: 0, gstRate: 18, lineTotal: 0 }]);
     setIsOpen(false);
@@ -317,7 +369,7 @@ export function TransactionForm({ type, onClose }: TransactionFormProps) {
                   )}
 
                   <div className="space-y-2">
-                    <Label htmlFor="date" className="text-sm font-medium">{type === 'sale' ? 'Invoice' : 'Purchase'} Date</Label>
+                    <Label htmlFor="date" className="text-sm font-medium">Billing Date</Label>
                     <Input
                       id="date"
                       type="date"
@@ -326,6 +378,61 @@ export function TransactionForm({ type, onClose }: TransactionFormProps) {
                       className="bg-background/50 border-muted-foreground/20"
                     />
                   </div>
+
+                  {type === 'sale' && (
+                    <div className="space-y-2">
+                      <Label htmlFor="paymentMethod" className="text-sm font-medium">Payment Type</Label>
+                      <Select
+                        value={formData.paymentMethod}
+                        onValueChange={(value: 'cash' | 'bill') => {
+                          const prefix = value === 'cash' ? 'CSH' : 'BIL';
+                          const year = new Date().getFullYear();
+                          const randomNum = Math.floor(Math.random() * 9000) + 1000;
+                          const newSerial = `${prefix}-${year}-${randomNum}`;
+                          setFormData({ 
+                            ...formData, 
+                            paymentMethod: value,
+                            cashSerialNumber: value === 'cash' ? newSerial : '',
+                            billSerialNumber: value === 'bill' ? newSerial : '',
+                          });
+                        }}
+                      >
+                        <SelectTrigger id="paymentMethod" className="w-full bg-background/50 border-muted-foreground/20">
+                          <SelectValue placeholder="Select payment type" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="cash">Cash</SelectItem>
+                          <SelectItem value="bill">Bill</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  )}
+
+                  {type === 'sale' && formData.paymentMethod === 'cash' && (
+                    <div className="space-y-2">
+                      <Label htmlFor="cashSerialNumber" className="text-sm font-medium">Cash Serial Number</Label>
+                      <Input
+                        id="cashSerialNumber"
+                        placeholder="CSH-2025-0001"
+                        value={formData.cashSerialNumber}
+                        onChange={(e) => setFormData({ ...formData, cashSerialNumber: e.target.value })}
+                        className="bg-background/50 border-muted-foreground/20"
+                      />
+                    </div>
+                  )}
+
+                  {type === 'sale' && formData.paymentMethod === 'bill' && (
+                    <div className="space-y-2">
+                      <Label htmlFor="billSerialNumber" className="text-sm font-medium">Bill Serial Number</Label>
+                      <Input
+                        id="billSerialNumber"
+                        placeholder="BIL-2025-0001"
+                        value={formData.billSerialNumber}
+                        onChange={(e) => setFormData({ ...formData, billSerialNumber: e.target.value })}
+                        className="bg-background/50 border-muted-foreground/20"
+                      />
+                    </div>
+                  )}
 
                   <div className="space-y-2">
                     <Label htmlFor="dueDate" className="text-sm font-medium">Due Date</Label>
@@ -606,6 +713,17 @@ export function TransactionForm({ type, onClose }: TransactionFormProps) {
           </div>
           
           <DialogFooter className="px-6 py-4 border-t bg-muted/10">
+            {editTransaction && (
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setShowInvoiceDialog(true)}
+                className="mr-auto"
+              >
+                <Eye className="w-4 h-4 mr-2" />
+                View / Print
+              </Button>
+            )}
             <Button
               type="button"
               variant="outline"
@@ -615,11 +733,19 @@ export function TransactionForm({ type, onClose }: TransactionFormProps) {
             </Button>
             <Button type="submit" className="shadow-sm px-8">
               <Save className="w-4 h-4 mr-2" />
-              Generate Serial
+              {editTransaction ? 'Save' : 'Generate Serial'}
             </Button>
           </DialogFooter>
         </form>
       </DialogContent>
+      {editTransaction && (
+        <InvoiceDialog
+          transaction={editTransaction}
+          company={selectedCompany}
+          isOpen={showInvoiceDialog}
+          onOpenChange={setShowInvoiceDialog}
+        />
+      )}
     </Dialog>
   );
 }

@@ -20,11 +20,16 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 interface InvoiceDialogProps {
   transaction: Transaction;
   company: Company | undefined;
+  isOpen?: boolean;
+  onOpenChange?: (open: boolean) => void;
 }
 
-export function InvoiceDialog({ transaction, company }: InvoiceDialogProps) {
+export function InvoiceDialog({ transaction, company, isOpen: externalIsOpen, onOpenChange }: InvoiceDialogProps) {
   const { products } = useData();
-  const [isOpen, setIsOpen] = useState(false);
+  const [internalIsOpen, setInternalIsOpen] = useState(false);
+
+  const isOpen = externalIsOpen !== undefined ? externalIsOpen : internalIsOpen;
+  const setIsOpen = onOpenChange || setInternalIsOpen;
 
 
   const handlePrint = () => {
@@ -34,12 +39,14 @@ export function InvoiceDialog({ transaction, company }: InvoiceDialogProps) {
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogTrigger asChild>
-        <Button variant="outline" size="sm" className="h-8 shadow-sm">
-          <Printer className="w-4 h-4 mr-2" />
-          View / Print
-        </Button>
-      </DialogTrigger>
+      {!onOpenChange && (
+        <DialogTrigger asChild>
+          <Button variant="outline" size="sm" className="h-8 shadow-sm" data-invoice-dialog-id={transaction.id}>
+            <Printer className="w-4 h-4 mr-2" />
+            View / Print
+          </Button>
+        </DialogTrigger>
+      )}
       <DialogContent className="sm:max-w-[750px] bg-background">
         <DialogHeader className="print:hidden">
           <DialogTitle>Document Details</DialogTitle>

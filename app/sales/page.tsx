@@ -10,7 +10,6 @@ import { InvoiceDialog } from '@/components/invoice-dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge, badgeVariants } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   Select,
   SelectContent,
@@ -18,13 +17,17 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Search, Filter } from 'lucide-react';
+import { Search, Filter, Pencil, Trash2, Eye } from 'lucide-react';
+import { Transaction } from '@/lib/types';
+import { toast } from 'sonner';
 
 export default function SalesPage() {
-  const { transactions, companies, payments, isLoaded } = useData();
+  const { transactions, companies, payments, isLoaded, deleteTransaction } = useData();
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [customerFilter, setCustomerFilter] = useState<string>('all');
+  const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null);
+  const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
 
   const salesTransactions = transactions.filter((t) => t.type === 'sale');
   const customers = companies.filter((c) => c.type === 'customer');
@@ -66,7 +69,11 @@ export default function SalesPage() {
     });
   }, [salesTransactions, searchQuery, statusFilter, customerFilter, companies, payments, transactions]);
 
-
+  const handleDelete = (transactionId: string) => {
+    deleteTransaction(transactionId);
+    toast.success('Sale deleted successfully');
+    setDeleteConfirmId(null);
+  };
 
   if (!isLoaded) {
     return (
@@ -83,10 +90,8 @@ export default function SalesPage() {
           <h1 className="text-2xl font-bold tracking-tight text-foreground">Sales</h1>
           <p className="text-sm text-muted-foreground">Manage serial numbers and track customer billing.</p>
         </div>
-        <TransactionForm type="sale" />
+        <TransactionForm type="sale" editTransaction={editingTransaction} onClose={() => setEditingTransaction(null)} />
       </div>
-
-
 
       <Card>
         <CardHeader>
@@ -145,6 +150,7 @@ export default function SalesPage() {
                 <TableHeader className="bg-muted/30">
                   <TableRow className="hover:bg-transparent">
                     <TableHead className="font-bold text-xs uppercase tracking-wider">Serial</TableHead>
+                    <TableHead className="font-bold text-xs uppercase tracking-wider">Payment</TableHead>
                     <TableHead className="font-bold text-xs uppercase tracking-wider">Customer</TableHead>
                     <TableHead className="font-bold text-xs uppercase tracking-wider">Date</TableHead>
                     <TableHead className="text-right font-bold text-xs uppercase tracking-wider">Amount</TableHead>
@@ -164,6 +170,11 @@ export default function SalesPage() {
                     return (
                       <TableRow key={transaction.id}>
                         <TableCell className="font-medium">{transaction.serialNumber}</TableCell>
+                        <TableCell>
+                          <Badge variant="outline" className={transaction.paymentMethod === 'cash' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-blue-50 text-blue-700 border-blue-200'}>
+                            {transaction.paymentMethod === 'cash' ? 'Cash' : 'Bill'}
+                          </Badge>
+                        </TableCell>
                         <TableCell>{getCompanyName(transaction.companyId)}</TableCell>
                         <TableCell className="text-muted-foreground">{formatDate(transaction.date)}</TableCell>
                         <TableCell className="text-right font-medium">
@@ -198,7 +209,45 @@ export default function SalesPage() {
                           </Badge>
                         </TableCell>
                         <TableCell className="text-right">
-                          <InvoiceDialog transaction={transaction} company={companies.find(c => c.id === transaction.companyId)} />
+                          <div className="flex items-center justify-end gap-1">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-8 w-8 text-muted-foreground hover:text-primary hover:bg-primary/10"
+                              onClick={() => setEditingTransaction(transaction)}
+                            >
+                              <Pencil className="w-4 h-4" />
+                            </Button>
+                            {deleteConfirmId === transaction.id ? (
+                              <div className="flex items-center gap-1">
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className="h-8 text-xs text-destructive hover:text-destructive"
+                                  onClick={() => handleDelete(transaction.id)}
+                                >
+                                  Confirm
+                                </Button>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className="h-8 text-xs"
+                                  onClick={() => setDeleteConfirmId(null)}
+                                >
+                                  Cancel
+                                </Button>
+                              </div>
+                            ) : (
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-8 w-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+                                onClick={() => setDeleteConfirmId(transaction.id)}
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </Button>
+                            )}
+                          </div>
                         </TableCell>
                       </TableRow>
                     );

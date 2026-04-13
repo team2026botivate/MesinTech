@@ -88,6 +88,9 @@ export type Transaction = {
   createdBy?: string;
   description?: string;
   status?: 'draft' | 'confirmed' | 'cancelled';
+  paymentMethod?: 'cash' | 'bill';
+  cashSerialNumber?: string;
+  billSerialNumber?: string;
 };
 
 export type Return = {
