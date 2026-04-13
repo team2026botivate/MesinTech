@@ -35,6 +35,7 @@ const navItems = [
   { href: '/returns', label: 'Returns', icon: RotateCcw },
   { href: '/expenses', label: 'Expenses', icon: Zap },
   { href: '/master', label: 'Master', icon: Building2 },
+  { href: '/inventory', label: 'Inventory', icon: Archive },
   { href: '/payments', label: 'Payments', icon: DollarSign },
   { href: '/notifications', label: 'Notifications', icon: Bell },
   { href: '/settings', label: 'Settings', icon: SettingsIcon },
