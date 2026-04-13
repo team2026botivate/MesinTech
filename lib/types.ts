@@ -107,9 +107,14 @@ export type Return = {
   returnReason: string;
   refundType?: 'cash_refund' | 'credit_note' | 'exchange';
   debitNoteAmount?: number;
-  refundAmount?: number;
+refundAmount?: number;
   restockToInventory?: boolean;
   stockDeducted?: boolean;
+  cashReturnAmount?: number;
+  cashReturnMode?: 'cash' | 'upi' | 'bank_transfer' | 'cheque';
+  cashReturnRef?: string;
+  cashReturnDate?: string;
+  cashReturnNotes?: string;
   status: 'pending' | 'approved' | 'rejected';
   notes?: string;
   createdAt?: string;
