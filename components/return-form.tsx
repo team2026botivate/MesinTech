@@ -227,7 +227,7 @@ export function ReturnForm({ initialReturn, onSubmit, defaultReturnType = 'sales
 
                 <div className="space-y-2 lg:col-span-2">
                   <Label htmlFor="originalTransaction" className="text-sm font-medium">
-                    Select Original {formData.returnType === 'sales' ? 'Sales' : 'Purchase'} Serial <span className="text-destructive">*</span>
+                    Select Company <span className="text-destructive">*</span>
                   </Label>
                   <Select
                     value={formData.originalTransactionId || ''}

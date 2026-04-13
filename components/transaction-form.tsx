@@ -379,32 +379,56 @@ export function TransactionForm({ type, onClose, editTransaction }: TransactionF
                     />
                   </div>
 
-                  {type === 'sale' && (
+                  <div className="space-y-2">
+                    <Label htmlFor="paymentMethod" className="text-sm font-medium">Payment Type</Label>
+                    <Select
+                      value={formData.paymentMethod}
+                      onValueChange={(value: 'cash' | 'bill') => {
+                        const prefix = value === 'cash' ? 'CSH' : 'BIL';
+                        const year = new Date().getFullYear();
+                        const randomNum = Math.floor(Math.random() * 9000) + 1000;
+                        const newSerial = `${prefix}-${year}-${randomNum}`;
+                        setFormData({ 
+                          ...formData, 
+                          paymentMethod: value,
+                          cashSerialNumber: value === 'cash' ? newSerial : '',
+                          billSerialNumber: value === 'bill' ? newSerial : '',
+                        });
+                      }}
+                    >
+                      <SelectTrigger id="paymentMethod" className="w-full bg-background/50 border-muted-foreground/20">
+                        <SelectValue placeholder="Select payment type" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="cash">Cash</SelectItem>
+                        <SelectItem value="bill">Bill</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  {formData.paymentMethod === 'cash' && (
                     <div className="space-y-2">
-                      <Label htmlFor="paymentMethod" className="text-sm font-medium">Payment Type</Label>
-                      <Select
-                        value={formData.paymentMethod}
-                        onValueChange={(value: 'cash' | 'bill') => {
-                          const prefix = value === 'cash' ? 'CSH' : 'BIL';
-                          const year = new Date().getFullYear();
-                          const randomNum = Math.floor(Math.random() * 9000) + 1000;
-                          const newSerial = `${prefix}-${year}-${randomNum}`;
-                          setFormData({ 
-                            ...formData, 
-                            paymentMethod: value,
-                            cashSerialNumber: value === 'cash' ? newSerial : '',
-                            billSerialNumber: value === 'bill' ? newSerial : '',
-                          });
-                        }}
-                      >
-                        <SelectTrigger id="paymentMethod" className="w-full bg-background/50 border-muted-foreground/20">
-                          <SelectValue placeholder="Select payment type" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="cash">Cash</SelectItem>
-                          <SelectItem value="bill">Bill</SelectItem>
-                        </SelectContent>
-                      </Select>
+                      <Label htmlFor="cashSerialNumber" className="text-sm font-medium">Cash Serial Number</Label>
+                      <Input
+                        id="cashSerialNumber"
+                        placeholder="CSH-2025-0001"
+                        value={formData.cashSerialNumber}
+                        onChange={(e) => setFormData({ ...formData, cashSerialNumber: e.target.value })}
+                        className="bg-background/50 border-muted-foreground/20"
+                      />
+                    </div>
+                  )}
+
+                  {formData.paymentMethod === 'bill' && (
+                    <div className="space-y-2">
+                      <Label htmlFor="billSerialNumber" className="text-sm font-medium">Bill Serial Number</Label>
+                      <Input
+                        id="billSerialNumber"
+                        placeholder="BIL-2025-0001"
+                        value={formData.billSerialNumber}
+                        onChange={(e) => setFormData({ ...formData, billSerialNumber: e.target.value })}
+                        className="bg-background/50 border-muted-foreground/20"
+                      />
                     </div>
                   )}
 
