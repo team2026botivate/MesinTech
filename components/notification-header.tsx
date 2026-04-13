@@ -1,7 +1,9 @@
 'use client';
 
+import React from 'react';
+import { useRouter } from 'next/navigation';
 import { useData } from '@/lib/data-context';
-import { Bell, CheckCircle2, Trash2, ExternalLink, Inbox } from 'lucide-react';
+import { Bell, CheckCircle2, Trash2, ExternalLink, Inbox, Clock, AlertTriangle, CheckCircle, ArrowLeft, DollarSign, LucideIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -22,6 +24,7 @@ import Link from 'next/link';
 
 export function NotificationHeader() {
   const { notifications, markNotificationAsRead, deleteNotification, isLoaded } = useData();
+  const router = useRouter();
 
   if (!isLoaded) return null;
 
@@ -30,12 +33,12 @@ export function NotificationHeader() {
     .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
     .slice(0, 10);
 
-  const typeIcons = {
-    payment_due: '⏰',
-    payment_overdue: '⚠️',
-    payment_received: '✅',
-    return_pending: '↩️',
-    expense_pending: '💰',
+  const typeIcons: Record<string, LucideIcon> = {
+    payment_due: Clock,
+    payment_overdue: AlertTriangle,
+    payment_received: CheckCircle,
+    return_pending: ArrowLeft,
+    expense_pending: DollarSign,
   };
 
   return (
@@ -68,7 +71,7 @@ export function NotificationHeader() {
           )}
         </div>
 
-        <ScrollArea className="max-h-[350px]">
+        <ScrollArea className="h-[350px]">
           {notifications.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-12 px-4 text-center">
               <div className="p-3 bg-muted rounded-full mb-3">
@@ -78,17 +81,25 @@ export function NotificationHeader() {
               <p className="text-xs text-muted-foreground mt-1">You're all caught up for now!</p>
             </div>
           ) : (
-            <div className="flex flex-col">
+            <div className="flex flex-col min-h-full">
               {sortedNotifications.map((notification) => (
                 <div 
                   key={notification.id}
+                  onClick={() => {
+                    markNotificationAsRead(notification.id);
+                    router.push(`/notifications?id=${notification.id}`);
+                  }}
                   className={cn(
-                    "flex flex-col gap-1 p-4 border-b last:border-0 hover:bg-muted/50 transition-colors relative",
+                    "flex flex-col gap-1 p-4 border-b last:border-0 hover:bg-muted/50 transition-colors relative cursor-pointer",
                     !notification.read && "bg-primary/[0.04]"
                   )}
                 >
                   <div className="flex items-start justify-between gap-3">
-                    <span className="text-xl shrink-0 mt-0.5">{typeIcons[notification.type as keyof typeof typeIcons]}</span>
+                    <span className="shrink-0 mt-0.5">
+                      {notification.type in typeIcons && typeIcons[notification.type] ? 
+                        React.createElement(typeIcons[notification.type], { className: "w-4 h-4" }) : 
+                        React.createElement(Bell, { className: "w-4 h-4" })}
+                    </span>
                     <div className="flex-1 space-y-1">
                       <p className={cn("text-xs leading-normal", !notification.read ? "text-foreground font-semibold" : "text-muted-foreground italic")}>
                         "{notification.message}"
@@ -100,7 +111,7 @@ export function NotificationHeader() {
                          <Button 
                            size="icon" 
                            variant="ghost" 
-                           className="h-6 w-6 text-emerald-600 hover:bg-emerald-50"
+                           className="h-6 w-6 text-primary hover:bg-accent"
                            onClick={(e) => {
                              e.preventDefault();
                              markNotificationAsRead(notification.id);

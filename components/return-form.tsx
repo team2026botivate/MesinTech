@@ -196,7 +196,62 @@ export function ReturnForm({ initialReturn, onSubmit, defaultReturnType = 'sales
         <form onSubmit={handleSubmit} className="flex-1 overflow-hidden flex flex-col min-h-0">
           <div className="flex-1 overflow-y-auto px-6 py-6 space-y-8">
             
-            {/* Section 1: Basic Info */}
+            {/* Section 1: Top - Return Type & Serial Selection */}
+            <div className="space-y-4">
+              <div className="flex items-center gap-2 mb-2">
+                <div className="h-4 w-1 bg-primary rounded-full" />
+                <h3 className="text-sm font-bold text-foreground uppercase tracking-tight">Select Original Transaction</h3>
+              </div>
+              
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="returnType" className="text-sm font-medium">Return Type <span className="text-destructive">*</span></Label>
+                  <Select
+                    value={formData.returnType || defaultReturnType}
+                    onValueChange={(value) => setFormData({ 
+                      ...formData, 
+                      returnType: value as 'sales' | 'purchase',
+                      originalTransactionId: undefined 
+                    })}
+                    disabled={!!initialReturn}
+                  >
+                    <SelectTrigger id="returnType" className="bg-background/50 border-muted-foreground/20 h-12">
+                      <SelectValue placeholder="Select type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="sales">Sales Return (Customer)</SelectItem>
+                      <SelectItem value="purchase">Purchase Return (Supplier)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2 lg:col-span-2">
+                  <Label htmlFor="originalTransaction" className="text-sm font-medium">
+                    Select Original {formData.returnType === 'sales' ? 'Sales' : 'Purchase'} Serial <span className="text-destructive">*</span>
+                  </Label>
+                  <Select
+                    value={formData.originalTransactionId || ''}
+                    onValueChange={(value) => setFormData({ ...formData, originalTransactionId: value })}
+                    disabled={!!initialReturn}
+                  >
+                    <SelectTrigger id="originalTransaction" className="bg-background/50 border-muted-foreground/20 h-12">
+                      <SelectValue placeholder="Search by serial number..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {getRelatedTransactions.map((t) => (
+                        <SelectItem key={t.id} value={t.id}>
+                          {t.serialNumber} - {companies.find(c => c.id === t.companyId)?.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            </div>
+
+            <Separator className="opacity-50" />
+
+            {/* Section 2: Basic Info */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
               <div className="lg:col-span-2 space-y-4">
                 <div className="flex items-center gap-2 mb-2">
@@ -205,27 +260,6 @@ export function ReturnForm({ initialReturn, onSubmit, defaultReturnType = 'sales
                 </div>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="returnType" className="text-sm font-medium">Return Type <span className="text-destructive">*</span></Label>
-                    <Select
-                      value={formData.returnType || defaultReturnType}
-                      onValueChange={(value) => setFormData({ 
-                        ...formData, 
-                        returnType: value as 'sales' | 'purchase',
-                        originalTransactionId: undefined 
-                      })}
-                      disabled={!!initialReturn}
-                    >
-                      <SelectTrigger id="returnType" className="bg-background/50 border-muted-foreground/20">
-                        <SelectValue placeholder="Select type" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="sales">Sales Return (Customer)</SelectItem>
-                        <SelectItem value="purchase">Purchase Return (Supplier)</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-
                   <div className="space-y-2">
                     <Label htmlFor="returnNumber" className="text-sm font-medium">Return ID</Label>
                     <Input
@@ -266,28 +300,6 @@ export function ReturnForm({ initialReturn, onSubmit, defaultReturnType = 'sales
                       </SelectContent>
                     </Select>
                   </div>
-
-                  <div className="space-y-2 md:col-span-2">
-                    <Label htmlFor="originalTransaction" className="text-sm font-medium">
-                      Select Original {formData.returnType === 'sales' ? 'Serial' : 'Purchase Serial'} <span className="text-destructive">*</span>
-                    </Label>
-                    <Select
-                      value={formData.originalTransactionId || ''}
-                      onValueChange={(value) => setFormData({ ...formData, originalTransactionId: value })}
-                      disabled={!!initialReturn}
-                    >
-                      <SelectTrigger id="originalTransaction" className="bg-background/50 border-muted-foreground/20">
-                        <SelectValue placeholder="Select transaction..." />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {getRelatedTransactions.map((t) => (
-                          <SelectItem key={t.id} value={t.id}>
-                            {t.serialNumber} - {companies.find(c => c.id === t.companyId)?.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
                 </div>
               </div>
 
@@ -300,7 +312,6 @@ export function ReturnForm({ initialReturn, onSubmit, defaultReturnType = 'sales
                   {selectedTransaction ? (
                     <div className="space-y-2">
                       <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Linked To</p>
-                      <p className="text-sm font-bold">{selectedCompany?.name}</p>
                       <p className="text-xs text-muted-foreground">Serial: {selectedTransaction.serialNumber}</p>
                       <p className="text-xs text-muted-foreground">Original Total: {formatCurrency(selectedTransaction.totalAmount || selectedTransaction.amount)}</p>
                       <Badge variant="outline" className="mt-2 bg-background/50">

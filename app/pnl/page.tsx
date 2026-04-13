@@ -83,10 +83,27 @@ export default function PNLPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState('overview');
   const [selectedCompanyId, setSelectedCompanyId] = useState<string>('all');
+  const [dateFrom, setDateFrom] = useState<string>('');
+  const [dateTo, setDateTo] = useState<string>('');
 
   const getCompany = (companyId: string) => companies.find(c => c.id === companyId);
   const getCompanyName = (companyId: string) => getCompany(companyId)?.name || 'Unknown';
   const getPaymentTerms = (companyId: string) => getCompany(companyId)?.paymentTermsDays || 0;
+
+  const filterByDate = (dateString: string): boolean => {
+    const transDate = new Date(dateString);
+    
+    if (dateFrom && dateTo) {
+      return transDate >= new Date(dateFrom) && transDate <= new Date(dateTo);
+    }
+    if (dateFrom) {
+      return transDate >= new Date(dateFrom);
+    }
+    if (dateTo) {
+      return transDate <= new Date(dateTo);
+    }
+    return true;
+  };
 
   const calculateDueDate = (transactionDate: string, paymentTerms: number): Date => {
     const date = new Date(transactionDate);
@@ -119,8 +136,8 @@ export default function PNLPage() {
     return 'pending';
   };
 
-  const sales = useMemo(() => transactions.filter(t => t.type === 'sale' && (selectedCompanyId === 'all' || t.companyId === selectedCompanyId)), [transactions, selectedCompanyId]);
-  const purchases = useMemo(() => transactions.filter(t => t.type === 'purchase' && (selectedCompanyId === 'all' || t.companyId === selectedCompanyId)), [transactions, selectedCompanyId]);
+  const sales = useMemo(() => transactions.filter(t => t.type === 'sale' && (selectedCompanyId === 'all' || t.companyId === selectedCompanyId) && filterByDate(t.date)), [transactions, selectedCompanyId, dateFrom, dateTo]);
+  const purchases = useMemo(() => transactions.filter(t => t.type === 'purchase' && (selectedCompanyId === 'all' || t.companyId === selectedCompanyId) && filterByDate(t.date)), [transactions, selectedCompanyId, dateFrom, dateTo]);
 
   const salesReturns = useMemo(
     () => returns.filter(r => r.type === 'sale' && r.status === 'approved'),
@@ -361,6 +378,30 @@ export default function PNLPage() {
           </p>
         </div>
         <div className="flex items-center gap-4">
+          <Input
+            type="date"
+            value={dateFrom}
+            onChange={(e) => setDateFrom(e.target.value)}
+            className="w-[150px] bg-background border-muted-foreground/20"
+          />
+          <span className="text-muted-foreground">to</span>
+          <Input
+            type="date"
+            value={dateTo}
+            onChange={(e) => setDateTo(e.target.value)}
+            min={dateFrom}
+            className="w-[150px] bg-background border-muted-foreground/20"
+          />
+          {(dateFrom || dateTo) && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => { setDateFrom(''); setDateTo(''); }}
+              className="text-muted-foreground"
+            >
+              Clear
+            </Button>
+          )}
           <Select value={selectedCompanyId} onValueChange={setSelectedCompanyId}>
             <SelectTrigger className="w-[220px] bg-background border-muted-foreground/20">
               <SelectValue placeholder="Select customer/vendor" />

@@ -46,7 +46,7 @@ export function InvoiceDialog({ transaction, company }: InvoiceDialogProps) {
         </DialogHeader>
 
         {/* This container will be specifically styled for print via global CSS or Tailwind print variants */}
-        <div id={`invoice-${transaction.id}`} className="p-6 bg-white text-black rounded-lg shadow-sm print:shadow-none print:p-0 my-4">
+        <div id={`invoice-${transaction.id}`} className="p-6 bg-white text-black rounded-lg shadow-sm print:shadow-none print:p-0 my-4 max-h-[70vh] overflow-y-auto">
           <Card className="border-none shadow-none bg-transparent">
             <CardHeader className="pb-6 mb-6 border-b border-gray-200">
               <div className="flex justify-between items-start">
