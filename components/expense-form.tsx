@@ -57,7 +57,7 @@ export function ExpenseForm({ initialExpense, onSubmit }: ExpenseFormProps) {
       return formData.courierAmount || 0;
     }
     if (formData.expenseType === 'travel') {
-      return (formData.travelAmount || 0) + (formData.tollParkingAmount || 0);
+      return formData.travelAmount || 0;
     }
     if (formData.expenseType === 'food') {
       return formData.foodAmount || 0;
@@ -129,7 +129,6 @@ export function ExpenseForm({ initialExpense, onSubmit }: ExpenseFormProps) {
     }, 500);
   };
 
-  const salesTransactions = transactions.filter(t => t.type === 'sale');
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -154,13 +153,34 @@ export function ExpenseForm({ initialExpense, onSubmit }: ExpenseFormProps) {
 
         <form onSubmit={handleSubmit} className="flex-1 overflow-hidden flex flex-col min-h-0">
           <div className="flex-1 overflow-y-auto px-6 py-8 space-y-10">
-              {/* Section 1: Basic Classification */}
               <div className="space-y-4">
                 <div className="flex items-center gap-2 mb-2">
                   <div className="h-4 w-1 bg-primary rounded-full" />
                   <h3 className="text-sm font-bold text-foreground uppercase tracking-tight">Basic Classification</h3>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+                  {/* Link to Transaction */}
+                  <div className="space-y-2">
+                    <Label className="text-xs font-bold uppercase opacity-70">Link to Transaction</Label>
+                    <Select
+                      value={formData.linkedTransactionId || 'none'}
+                      onValueChange={(value) => setFormData({ ...formData, linkedTransactionId: value === 'none' ? undefined : value })}
+                    >
+                      <SelectTrigger className="w-full bg-background border-muted-foreground/20 h-10">
+                        <SelectValue placeholder="Select (Sale/Purchase)" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="none">None</SelectItem>
+                        {transactions.map((t) => (
+                          <SelectItem key={t.id} value={t.id}>
+                            {t.serialNumber} ({t.type === 'sale' ? 'Sales' : 'Purchase'})
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  {/* Expense ID */}
                   <div className="space-y-2">
                     <Label htmlFor="expenseNumber" className="text-xs font-bold uppercase opacity-70">Expense ID</Label>
                     <Input
@@ -168,10 +188,11 @@ export function ExpenseForm({ initialExpense, onSubmit }: ExpenseFormProps) {
                       readOnly
                       value={formData.expenseNumber}
                       onChange={(e) => setFormData({ ...formData, expenseNumber: e.target.value })}
-                      className="bg-background/20 border-muted-foreground/20 h-10 cursor-not-allowed"
+                      className="bg-background/20 border-muted-foreground/20 h-10 cursor-not-allowed w-full"
                     />
                   </div>
 
+                  {/* Expense Date */}
                   <div className="space-y-2">
                     <Label htmlFor="expenseDate" className="text-xs font-bold uppercase opacity-70">Expense Date *</Label>
                     <Input
@@ -179,10 +200,11 @@ export function ExpenseForm({ initialExpense, onSubmit }: ExpenseFormProps) {
                       type="date"
                       value={formData.expenseDate}
                       onChange={(e) => setFormData({ ...formData, expenseDate: e.target.value })}
-                      className="bg-background border-muted-foreground/20 h-10"
+                      className="bg-background border-muted-foreground/20 h-10 w-full"
                     />
                   </div>
 
+                  {/* Expense Type */}
                   <div className="space-y-2">
                     <Label htmlFor="expenseType" className="text-xs font-bold uppercase opacity-70">Expense Type *</Label>
                     <Select
@@ -194,7 +216,7 @@ export function ExpenseForm({ initialExpense, onSubmit }: ExpenseFormProps) {
                         })
                       }
                     >
-                      <SelectTrigger id="expenseType" className="bg-background border-muted-foreground/20 h-10">
+                      <SelectTrigger id="expenseType" className="w-full bg-background border-muted-foreground/20 h-10">
                         <SelectValue placeholder="Select type" />
                       </SelectTrigger>
                       <SelectContent>
@@ -202,24 +224,6 @@ export function ExpenseForm({ initialExpense, onSubmit }: ExpenseFormProps) {
                         <SelectItem value="travel">Travel & Conveyance</SelectItem>
                         <SelectItem value="food">Food & Hospitality</SelectItem>
                         <SelectItem value="other">General / Others</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="status" className="text-xs font-bold uppercase opacity-70">Verification Status</Label>
-                    <Select
-                      value={formData.status || 'pending'}
-                      onValueChange={(value) =>
-                        setFormData({ ...formData, status: value as 'pending' | 'approved' })
-                      }
-                    >
-                      <SelectTrigger id="status" className="bg-background border-muted-foreground/20 h-10">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="pending">Pending Approval</SelectItem>
-                        <SelectItem value="approved">Approved / Paid</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -351,16 +355,8 @@ export function ExpenseForm({ initialExpense, onSubmit }: ExpenseFormProps) {
                           </SelectContent>
                         </Select>
                       </div>
-                      <div className="flex items-center gap-2 pt-8">
-                        <Switch
-                          checked={formData.returnTrip || false}
-                          onCheckedChange={(checked) => setFormData({ ...formData, returnTrip: checked })}
-                          id="returnTrip"
-                        />
-                        <Label htmlFor="returnTrip" className="text-sm font-medium">Round Trip Included</Label>
-                      </div>
                       <div className="space-y-2">
-                        <Label htmlFor="travelAmount" className="text-xs font-bold uppercase opacity-70">Base Travel Fare *</Label>
+                        <Label htmlFor="travelAmount" className="text-xs font-bold uppercase opacity-70">Travelling Expenses *</Label>
                         <div className="relative">
                           <span className="absolute left-3 top-2.5 text-muted-foreground">₹</span>
                           <Input
@@ -370,20 +366,6 @@ export function ExpenseForm({ initialExpense, onSubmit }: ExpenseFormProps) {
                             value={formData.travelAmount || ''}
                             onChange={(e) => setFormData({ ...formData, travelAmount: parseFloat(e.target.value) || 0 })}
                             className="pl-8 bg-background h-10 font-medium"
-                          />
-                        </div>
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="tollParkingAmount" className="text-xs font-bold uppercase opacity-70">Toll & Parking Charges</Label>
-                        <div className="relative">
-                          <span className="absolute left-3 top-2.5 text-muted-foreground">₹</span>
-                          <Input
-                            id="tollParkingAmount"
-                            type="number"
-                            step="0.01"
-                            value={formData.tollParkingAmount || ''}
-                            onChange={(e) => setFormData({ ...formData, tollParkingAmount: parseFloat(e.target.value) || 0 })}
-                            className="pl-8 bg-background h-10"
                           />
                         </div>
                       </div>
@@ -418,17 +400,6 @@ export function ExpenseForm({ initialExpense, onSubmit }: ExpenseFormProps) {
                             <SelectItem value="snacks">Snacks / Refreshments</SelectItem>
                           </SelectContent>
                         </Select>
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="numberOfPeople" className="text-xs font-bold uppercase opacity-70">Number of People Covered</Label>
-                        <Input
-                          id="numberOfPeople"
-                          type="number"
-                          min="1"
-                          value={formData.numberOfPeople || ''}
-                          onChange={(e) => setFormData({ ...formData, numberOfPeople: parseInt(e.target.value) || undefined })}
-                          className="bg-background h-10"
-                        />
                       </div>
                       <div className="space-y-2">
                         <Label htmlFor="foodAmount" className="text-xs font-bold uppercase opacity-70 text-primary">Bill Amount *</Label>
@@ -487,58 +458,6 @@ export function ExpenseForm({ initialExpense, onSubmit }: ExpenseFormProps) {
                       </div>
                     </div>
                   )}
-                </div>
-              </div>
-
-              <Separator className="opacity-50" />
-
-              {/* Section 3: Relationship & Links */}
-              <div className="space-y-4">
-                <div className="flex items-center gap-2 mb-2">
-                  <div className="h-4 w-1 bg-primary rounded-full" />
-                  <h3 className="text-sm font-bold text-foreground uppercase tracking-tight">Relationship & Links</h3>
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
-                  <div className="space-y-2">
-                    <Label htmlFor="companyId" className="text-xs font-bold uppercase opacity-70">Associated Business Entity</Label>
-                    <Select
-                      value={formData.companyId || 'none'}
-                      onValueChange={(value) => setFormData({ ...formData, companyId: value === 'none' ? undefined : value })}
-                    >
-                      <SelectTrigger id="companyId" className="bg-background h-10">
-                        <SelectValue placeholder="Select customer/supplier..." />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="none">None / House Expense</SelectItem>
-                        {companies.map((c) => (
-                          <SelectItem key={c.id} value={c.id}>
-                            {c.name} ({c.type})
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="linkedTransaction" className="text-xs font-bold uppercase opacity-70">Link to Sales Serial</Label>
-                    <Select
-                      value={formData.linkedTransactionId || 'none'}
-                      onValueChange={(value) => setFormData({ ...formData, linkedTransactionId: value === 'none' ? undefined : value })}
-                    >
-                      <SelectTrigger id="linkedTransaction" className="bg-background h-10">
-                        <SelectValue placeholder="Select invoice..." />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="none">None</SelectItem>
-                        {salesTransactions.map((t) => (
-                          <SelectItem key={t.id} value={t.id}>
-                            {t.serialNumber}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
                 </div>
               </div>
 

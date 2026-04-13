@@ -258,23 +258,6 @@ export function ProductForm({ product, onSubmit, onCancel, open, onOpenChange }:
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="purchasePrice" className="text-xs font-bold uppercase opacity-70">Baseline Purchase Price</Label>
-                    <div className="relative">
-                      <span className="absolute left-3 top-2.5 text-muted-foreground font-bold">₹</span>
-                      <Input
-                        id="purchasePrice"
-                        type="number"
-                        min="0"
-                        step="0.01"
-                        placeholder="0.00"
-                        value={formData.purchasePrice}
-                        onChange={(e) => setFormData({ ...formData, purchasePrice: parseFloat(e.target.value) || 0 })}
-                        className="pl-8 bg-background border-muted-foreground/20 h-10"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
                     <Label htmlFor="unit" className="text-xs font-bold uppercase opacity-70">Unit of Measurement *</Label>
                     <Select 
                       value={formData.unit} 
@@ -350,21 +333,7 @@ export function ProductForm({ product, onSubmit, onCancel, open, onOpenChange }:
                   </div>
                 </div>
 
-                <div className="flex items-center justify-between p-4 bg-muted/30 rounded-2xl border border-muted-foreground/10">
-                  <div className="space-y-1">
-                    <Label className="text-sm font-bold uppercase tracking-tight">Master Resource Status</Label>
-                    <p className="text-xs text-muted-foreground font-medium">Inactive products are hidden from transaction dropdowns</p>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <span className={`text-[10px] font-black uppercase tracking-widest ${formData.status === 'active' ? 'text-emerald-600' : 'text-muted-foreground'}`}>
-                      {formData.status === 'active' ? 'Live' : 'Archived'}
-                    </span>
-                    <Switch
-                      checked={formData.status === 'active'}
-                      onCheckedChange={(checked) => setFormData({ ...formData, status: checked ? 'active' : 'inactive' })}
-                    />
-                  </div>
-                </div>
+                
               </div>
           </div>
 

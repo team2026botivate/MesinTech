@@ -14,12 +14,13 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import { useData } from '@/lib/data-context';
 import { Return, LineItem } from '@/lib/types';
-import { Plus, Trash2, Save, Calculator, Search } from 'lucide-react';
+import { Plus, Trash2, Save, Calculator, Search, Check, ChevronsUpDown } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
   DialogTrigger,
   DialogFooter,
 } from '@/components/ui/dialog';
@@ -36,6 +37,20 @@ import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { formatCurrency } from '@/lib/format';
 import { toast } from 'sonner';
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from '@/components/ui/command';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
+import { cn } from '@/lib/utils';
 
 interface ReturnFormProps {
   initialReturn?: Return;
@@ -54,8 +69,8 @@ export function ReturnForm({ initialReturn, onSubmit, defaultReturnType = 'sales
   const { transactions, companies, products, addReturn, updateReturn } = useData();
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [billNumberSearch, setBillNumberSearch] = useState('');
   const [billSearchError, setBillSearchError] = useState('');
+  const [isTxPopoverOpen, setIsTxPopoverOpen] = useState(false);
   const [formData, setFormData] = useState<Partial<Return>>(
     initialReturn || {
       returnType: defaultReturnType,
@@ -77,38 +92,10 @@ export function ReturnForm({ initialReturn, onSubmit, defaultReturnType = 'sales
     return transactions.filter((t) => isSaleReturn ? t.type === 'sale' : t.type === 'purchase');
   }, [formData.returnType, transactions]);
 
-  const handleBillNumberSearch = () => {
-    if (!billNumberSearch.trim()) {
-      setBillSearchError('');
-      return;
-    }
-    
-    const isSaleReturn = formData.returnType === 'sales';
-    const foundTransaction = transactions.find(
-      (t) => 
-        t.serialNumber.toLowerCase() === billNumberSearch.toLowerCase() &&
-        (isSaleReturn ? t.type === 'sale' : t.type === 'purchase')
-    );
-
-    if (foundTransaction) {
-      setFormData({ ...formData, originalTransactionId: foundTransaction.id });
-      setBillSearchError('');
-      
-      const mappedItems: LineItem[] = (foundTransaction.lineItems || []).map((item) => ({
-        ...item,
-        id: `return-${item.id}-${Date.now()}`,
-        quantity: item.quantity,
-        lineTotal: item.quantity * item.unitPrice,
-      }));
-      setReturnItems(mappedItems);
-    } else {
-      setBillSearchError(`No ${isSaleReturn ? 'Sales' : 'Purchase'} bill found with number "${billNumberSearch}"`);
-    }
-  };
-
   const handleTransactionSelect = (transactionId: string) => {
     setFormData({ ...formData, originalTransactionId: transactionId });
-    setBillNumberSearch('');
+    setBillSearchError('');
+    setIsTxPopoverOpen(false);
     
     const transaction = transactions.find(t => t.id === transactionId);
     if (transaction) {
@@ -121,15 +108,6 @@ export function ReturnForm({ initialReturn, onSubmit, defaultReturnType = 'sales
       setReturnItems(mappedItems);
     }
   };
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      if (billNumberSearch.trim()) {
-        handleBillNumberSearch();
-      }
-    }, 500);
-    return () => clearTimeout(timer);
-  }, [billNumberSearch, formData.returnType]);
 
   const selectedTransaction = useMemo(() => {
     return transactions.find(t => t.id === formData.originalTransactionId);
@@ -247,79 +225,116 @@ export function ReturnForm({ initialReturn, onSubmit, defaultReturnType = 'sales
           </Button>
         )}
       </DialogTrigger>
-      <DialogContent className="sm:max-w-5xl max-h-[95vh] flex flex-col p-0 overflow-hidden">
-        <DialogHeader className="px-6 py-4 border-b">
-          <DialogTitle className="text-xl font-bold tracking-tight">
-            {initialReturn ? 'Edit Return RECORD' : `Create ${formData.returnType === 'sales' ? 'Sales' : 'Purchase'} Return`}
-          </DialogTitle>
-        </DialogHeader>
+        <DialogContent className="sm:max-w-5xl max-h-[95vh] flex flex-col p-0 overflow-hidden">
+          <DialogHeader className="px-6 py-4 border-b">
+            <DialogTitle className="text-xl font-bold tracking-tight">
+              {initialReturn ? 'Edit Return RECORD' : `Create ${formData.returnType === 'sales' ? 'Sales' : 'Purchase'} Return`}
+            </DialogTitle>
+            <DialogDescription className="sr-only">
+              Fill out the form below to process a return for a sale or purchase transaction.
+            </DialogDescription>
+          </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="flex-1 overflow-hidden flex flex-col min-h-0">
-          <div className="flex-1 overflow-y-auto px-6 py-6 space-y-8">
-            
-            {/* Section 1: Top - Return Type & Bill Number */}
-            <div className="space-y-4">
-              <div className="flex items-center gap-2 mb-2">
-                <div className="h-4 w-1 bg-primary rounded-full" />
-                <h3 className="text-sm font-bold text-foreground uppercase tracking-tight">Enter Bill Number</h3>
-              </div>
+          <form onSubmit={handleSubmit} className="flex-1 overflow-hidden flex flex-col min-h-0">
+            <div className="flex-1 overflow-y-auto px-6 py-6 space-y-8">
               
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="returnType" className="text-sm font-medium">Return Type <span className="text-destructive">*</span></Label>
-                  <Select
-                    value={formData.returnType || defaultReturnType}
-                    onValueChange={(value) => setFormData({ 
-                      ...formData, 
-                      returnType: value as 'sales' | 'purchase',
-                      originalTransactionId: undefined 
-                    })}
-                    disabled={!!initialReturn}
-                  >
-                    <SelectTrigger id="returnType" className="bg-background/50 border-muted-foreground/20 h-12">
-                      <SelectValue placeholder="Select type" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="sales">Sales Return (Customer)</SelectItem>
-                      <SelectItem value="purchase">Purchase Return (Supplier)</SelectItem>
-                    </SelectContent>
-                  </Select>
+              {/* Section 1: Top - Return Type & Bill Number */}
+              <div className="space-y-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="h-4 w-1 bg-primary rounded-full" />
+                  <h3 className="text-sm font-bold text-foreground uppercase tracking-tight">Enter Bill Number</h3>
                 </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="billNumber" className="text-sm font-medium">Bill Number <span className="text-destructive">*</span></Label>
-                  <div className="relative">
-                    <Input
-                      id="billNumber"
-                      placeholder="Enter bill serial number"
-                      value={billNumberSearch}
-                      onChange={(e) => setBillNumberSearch(e.target.value)}
+                
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="returnType" className="text-sm font-medium">Return Type <span className="text-destructive">*</span></Label>
+                    <Select
+                      value={formData.returnType || defaultReturnType}
+                      onValueChange={(value) => setFormData({ 
+                        ...formData, 
+                        returnType: value as 'sales' | 'purchase',
+                        originalTransactionId: undefined 
+                      })}
                       disabled={!!initialReturn}
-                      className="bg-background/50 border-muted-foreground/20 h-12 pr-10"
-                    />
-                    <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground/50" />
+                    >
+                      <SelectTrigger id="returnType" className="bg-background/50 border-muted-foreground/20 h-12">
+                        <SelectValue placeholder="Select type" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="sales">Sales Return (Customer)</SelectItem>
+                        <SelectItem value="purchase">Purchase Return (Supplier)</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
-                  {billSearchError && <p className="text-xs text-destructive">{billSearchError}</p>}
-                </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="originalTransaction" className="text-sm font-medium">Or Select Manually</Label>
-                  <Select
-                    value={formData.originalTransactionId || ''}
-                    onValueChange={(value) => handleTransactionSelect(value)}
-                    disabled={!!initialReturn}
-                  >
-                    <SelectTrigger id="originalTransaction" className="bg-background/50 border-muted-foreground/20 h-12">
-                      <SelectValue placeholder="Select transaction..." />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {getRelatedTransactions.map((t) => (
-                        <SelectItem key={t.id} value={t.id}>
-                          {t.serialNumber} - {companies.find(c => c.id === t.companyId)?.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <div className="lg:col-span-2 space-y-2">
+                    <Label htmlFor="originalTransaction" className="text-sm font-medium">Search & Select Transaction <span className="text-destructive">*</span></Label>
+                    <Popover open={isTxPopoverOpen} onOpenChange={setIsTxPopoverOpen}>
+                      <PopoverTrigger asChild>
+                        <Button
+                          id="originalTransaction"
+                          variant="outline"
+                          role="combobox"
+                          aria-expanded={isTxPopoverOpen}
+                          disabled={!!initialReturn}
+                          className="w-full justify-between bg-background/50 border-muted-foreground/20 h-12 text-left font-normal"
+                        >
+                          {selectedTransaction
+                            ? `${selectedTransaction.serialNumber} - ${companies.find(c => c.id === selectedTransaction.companyId)?.name}`
+                            : "Search by Bill Number or Entity name..."}
+                          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-[--radix-popover-trigger-width] p-0 shadow-2xl border-primary/10" align="start">
+                        <Command className="rounded-xl">
+                          <CommandInput 
+                            placeholder="Type Bill Number or Entity name..." 
+                            className="h-12 border-none focus:ring-0"
+                          />
+                          <CommandList 
+                            className="max-h-[300px] overflow-y-auto overflow-x-hidden overscroll-contain"
+                            onWheel={(e) => e.stopPropagation()}
+                          >
+                            <CommandEmpty className="py-6 text-center text-sm text-muted-foreground italic">
+                              No matching transaction found.
+                            </CommandEmpty>
+                            <CommandGroup heading={formData.returnType === 'sales' ? 'Recent Sales Invoices' : 'Recent Purchase Bills'}>
+                            {getRelatedTransactions.map((t) => (
+                              <CommandItem
+                                key={t.id}
+                                value={`${t.serialNumber} ${companies.find(c => c.id === t.companyId)?.name}`}
+                                onSelect={() => handleTransactionSelect(t.id)}
+                                className={cn(
+                                  "flex items-center gap-3 px-4 py-3 cursor-pointer transition-all",
+                                  formData.originalTransactionId === t.id ? "bg-primary/5 border-l-2 border-primary" : "border-l-2 border-transparent"
+                                )}
+                              >
+                                <div className={cn(
+                                  "flex items-center justify-center h-8 w-8 rounded-full shrink-0",
+                                  formData.originalTransactionId === t.id ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"
+                                )}>
+                                  <Check className={cn("h-4 w-4", formData.originalTransactionId === t.id ? "opacity-100" : "opacity-20")} />
+                                </div>
+                                <div className="flex items-center justify-between w-full min-w-0">
+                                  <div className="flex flex-col min-w-0">
+                                    <span className="font-bold text-sm text-foreground truncate">{t.serialNumber}</span>
+                                    <span className="text-[10px] text-muted-foreground uppercase font-bold tracking-tight truncate">
+                                      {companies.find(c => c.id === t.companyId)?.name}
+                                    </span>
+                                  </div>
+                                  <div className="flex flex-col items-end shrink-0 ml-4">
+                                    <span className="text-sm font-black text-foreground">{formatCurrency(t.totalAmount || t.amount)}</span>
+                                    <span className="text-[10px] text-muted-foreground italic">{t.date}</span>
+                                  </div>
+                                </div>
+                              </CommandItem>
+                            ))}
+                          </CommandGroup>
+                        </CommandList>
+                      </Command>
+                    </PopoverContent>
+                  </Popover>
+                  {billSearchError && <p className="text-xs text-destructive mt-1">{billSearchError}</p>}
                 </div>
               </div>
             </div>
