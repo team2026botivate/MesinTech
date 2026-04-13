@@ -246,28 +246,38 @@ export function ReturnForm({ initialReturn, onSubmit, defaultReturnType = 'sales
                 </div>
                 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="returnType" className="text-sm font-medium">Return Type <span className="text-destructive">*</span></Label>
-                    <Select
-                      value={formData.returnType || defaultReturnType}
-                      onValueChange={(value) => setFormData({ 
-                        ...formData, 
-                        returnType: value as 'sales' | 'purchase',
-                        originalTransactionId: undefined 
-                      })}
-                      disabled={!!initialReturn}
-                    >
-                      <SelectTrigger id="returnType" className="bg-background/50 border-muted-foreground/20 h-12">
-                        <SelectValue placeholder="Select type" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="sales">Sales Return (Customer)</SelectItem>
-                        <SelectItem value="purchase">Purchase Return (Supplier)</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
+                  {!initialReturn && (
+                    <div className="lg:col-span-3 flex items-center gap-2 p-3 bg-muted/30 rounded-lg border border-muted-foreground/10">
+                      <div className="h-6 w-1 bg-primary rounded-full" />
+                      <p className="text-sm font-medium">
+                        Creating: <span className="text-primary font-bold uppercase">{defaultReturnType === 'sales' ? 'Sales Return' : 'Purchase Return'}</span>
+                      </p>
+                    </div>
+                  )}
+                  {initialReturn && (
+                    <div className="space-y-2">
+                      <Label htmlFor="returnType" className="text-sm font-medium">Return Type <span className="text-destructive">*</span></Label>
+                      <Select
+                        value={formData.returnType || defaultReturnType}
+                        onValueChange={(value) => setFormData({ 
+                          ...formData, 
+                          returnType: value as 'sales' | 'purchase',
+                          originalTransactionId: undefined 
+                        })}
+                        disabled={!!initialReturn}
+                      >
+                        <SelectTrigger id="returnType" className="bg-background/50 border-muted-foreground/20 h-12">
+                          <SelectValue placeholder="Select type" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="sales">Sales Return (Customer)</SelectItem>
+                          <SelectItem value="purchase">Purchase Return (Supplier)</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  )}
 
-                  <div className="lg:col-span-2 space-y-2">
+                  <div className={initialReturn ? "space-y-2" : "lg:col-span-3 space-y-2"}>
                     <Label htmlFor="originalTransaction" className="text-sm font-medium">Search & Select Transaction <span className="text-destructive">*</span></Label>
                     <Popover open={isTxPopoverOpen} onOpenChange={setIsTxPopoverOpen}>
                       <PopoverTrigger asChild>

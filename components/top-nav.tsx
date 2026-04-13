@@ -20,7 +20,8 @@ import {
   Truck,
   Building2,
   TrendingUp,
-  ClipboardList
+  ClipboardList,
+  Receipt
 } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
@@ -31,6 +32,7 @@ import { NotificationHeader } from './notification-header';
 const navItems = [
   { href: '/home', label: 'Home', icon: Home },
   { href: '/pnl', label: 'Profit & Loss', icon: TrendingUp },
+  { href: '/bills', label: 'Bills', icon: Receipt },
   { href: '/sales', label: 'Sales', icon: FileText },
   { href: '/purchases', label: 'Purchases', icon: Package },
   { href: '/returns', label: 'Returns', icon: RotateCcw },

@@ -55,6 +55,7 @@ import { User } from '@/lib/types';
 const allModules = [
   { href: '/home', label: 'Dashboard', icon: 'LayoutDashboard' },
   { href: '/pnl', label: 'Profit & Loss', icon: 'TrendingUp' },
+  { href: '/bills', label: 'Bills', icon: 'Receipt' },
   { href: '/sales', label: 'Sales', icon: 'FileText' },
   { href: '/purchases', label: 'Purchases', icon: 'Package' },
   { href: '/returns', label: 'Returns', icon: 'RotateCcw' },
@@ -106,7 +107,7 @@ export default function SettingsPage() {
       username: '', 
       password: '', 
       role: 'user',
-      accessibleModules: ['/home', '/sales', '/master'] // Default set for new users
+      accessibleModules: ['/home', '/bills', '/sales', '/master'] // Default set for new users
     });
     setIsUserModalOpen(true);
   };

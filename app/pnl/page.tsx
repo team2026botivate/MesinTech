@@ -79,7 +79,7 @@ const profitPieConfig = {
 } satisfies ChartConfig
 
 export default function PNLPage() {
-  const { transactions, companies, payments, returns, products, isLoaded } = useData();
+  const { transactions, companies, payments, returns, products, expenses, isLoaded } = useData();
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState('overview');
   const [selectedCompanyId, setSelectedCompanyId] = useState<string>('all');
@@ -89,6 +89,19 @@ export default function PNLPage() {
   const getCompany = (companyId: string) => companies.find(c => c.id === companyId);
   const getCompanyName = (companyId: string) => getCompany(companyId)?.name || 'Unknown';
   const getPaymentTerms = (companyId: string) => getCompany(companyId)?.paymentTermsDays || 0;
+
+  const getExpensesBySerialNumber = (serialNumber: string) => {
+    return expenses.filter(e => e.linkedTransactionId === serialNumber || e.notes?.includes(serialNumber));
+  };
+
+  const getTotalExpenseBySerialNumber = (serialNumber: string) => {
+    return getExpensesBySerialNumber(serialNumber).reduce((sum, e) => sum + e.totalExpense, 0);
+  };
+
+  const getPurchaseFromSerialNumber = (serialNumber: string): { price: number; amount: number } => {
+    const purchase = transactions.find(t => t.serialNumber === serialNumber && t.type === 'purchase');
+    return { price: purchase?.totalAmount || 0, amount: purchase?.totalAmount || 0 };
+  };
 
   const filterByDate = (dateString: string): boolean => {
     const transDate = new Date(dateString);
@@ -594,8 +607,11 @@ export default function PNLPage() {
                       <TableHead className="font-bold text-xs uppercase">Due Date</TableHead>
                       <TableHead className="font-bold text-xs uppercase">Days</TableHead>
                       <TableHead className="text-right font-bold text-xs uppercase">Amount</TableHead>
+                      <TableHead className="text-right font-bold text-xs uppercase">Purchase Price</TableHead>
+                      <TableHead className="text-right font-bold text-xs uppercase">Expense</TableHead>
                       <TableHead className="text-right font-bold text-xs uppercase">Paid</TableHead>
                       <TableHead className="text-right font-bold text-xs uppercase">Balance</TableHead>
+                      <TableHead className="text-right font-bold text-xs uppercase">Profit/Loss</TableHead>
                       <TableHead className="font-bold text-xs uppercase">Status</TableHead>
                     </TableRow>
                   </TableHeader>
@@ -617,6 +633,9 @@ export default function PNLPage() {
                         const daysPassed = Math.floor((today.getTime() - new Date(t.date).getTime()) / (1000 * 60 * 60 * 24));
                         const daysRemaining = Math.max(0, paymentTerms - daysPassed);
                         const daysOverdue = Math.max(0, daysPassed - paymentTerms);
+                        const purchaseInfo = getPurchaseFromSerialNumber(t.serialNumber);
+                        const expenseAmount = getTotalExpenseBySerialNumber(t.serialNumber);
+                        const profitLoss = paidAmount - purchaseInfo.price - expenseAmount;
                         
                         return (
                           <TableRow key={t.id}>
@@ -639,9 +658,11 @@ export default function PNLPage() {
                               )}
                             </TableCell>
                             <TableCell className="text-right whitespace-nowrap">{formatCurrency(t.totalAmount)}</TableCell>
+                            <TableCell className="text-right text-muted-foreground whitespace-nowrap">{formatCurrency(purchaseInfo.price)}</TableCell>
+                            <TableCell className="text-right text-muted-foreground whitespace-nowrap">{formatCurrency(expenseAmount)}</TableCell>
                             <TableCell className="text-right text-muted-foreground whitespace-nowrap">{formatCurrency(paidAmount)}</TableCell>
-                            <TableCell className={cn("text-right font-semibold whitespace-nowrap", status === 'loss' && balance > 0 ? "text-red-600" : "")}>
-                              {formatCurrency(balance)}
+                            <TableCell className={cn("text-right font-semibold whitespace-nowrap", profitLoss < 0 ? "text-red-600" : "text-emerald-600")}>
+                              {formatCurrency(profitLoss)}
                             </TableCell>
                             <TableCell>
                               <Badge
@@ -662,7 +683,7 @@ export default function PNLPage() {
                       })}
                     {[...salesProfitList, ...salesPendingList, ...salesLossList].length === 0 && (
                       <TableRow>
-                        <TableCell colSpan={10} className="h-24 text-center text-muted-foreground">
+                        <TableCell colSpan={12} className="h-24 text-center text-muted-foreground">
                           No sales transactions found.
                         </TableCell>
                       </TableRow>
@@ -703,20 +724,31 @@ export default function PNLPage() {
                       <TableHead className="font-bold text-xs uppercase">Customer</TableHead>
                       <TableHead className="font-bold text-xs uppercase">Date</TableHead>
                       <TableHead className="text-right font-bold text-xs uppercase">Amount</TableHead>
+                      <TableHead className="text-right font-bold text-xs uppercase">Purchase Price</TableHead>
+                      <TableHead className="text-right font-bold text-xs uppercase">Expense</TableHead>
                       <TableHead className="text-right font-bold text-xs uppercase">Paid</TableHead>
+                      <TableHead className="text-right font-bold text-xs uppercase">Profit/Loss</TableHead>
                       <TableHead className="font-bold text-xs uppercase">Status</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {filteredSalesProfit.map(t => {
                       const paidAmount = getPaidAmount(t.id);
+                      const purchaseInfo = getPurchaseFromSerialNumber(t.serialNumber);
+                      const expenseAmount = getTotalExpenseBySerialNumber(t.serialNumber);
+                      const profitLoss = paidAmount - purchaseInfo.price - expenseAmount;
                       return (
                         <TableRow key={t.id}>
                           <TableCell className="font-medium">{t.serialNumber}</TableCell>
                           <TableCell>{getCompanyName(t.companyId)}</TableCell>
                           <TableCell className="text-muted-foreground">{formatDate(t.date)}</TableCell>
                           <TableCell className="text-right">{formatCurrency(t.totalAmount)}</TableCell>
+                          <TableCell className="text-right text-muted-foreground">{formatCurrency(purchaseInfo.price)}</TableCell>
+                          <TableCell className="text-right text-muted-foreground">{formatCurrency(expenseAmount)}</TableCell>
                           <TableCell className="text-right text-emerald-600">{formatCurrency(paidAmount)}</TableCell>
+                          <TableCell className={cn("text-right font-semibold", profitLoss < 0 ? "text-red-600" : "text-emerald-600")}>
+                            {formatCurrency(profitLoss)}
+                          </TableCell>
                           <TableCell>
                             <Badge className="bg-emerald-100 text-emerald-800">Profit</Badge>
                           </TableCell>
@@ -725,7 +757,7 @@ export default function PNLPage() {
                     })}
                     {filteredSalesProfit.length === 0 && (
                       <TableRow>
-                        <TableCell colSpan={6} className="h-24 text-center text-muted-foreground">
+                        <TableCell colSpan={9} className="h-24 text-center text-muted-foreground">
                           No paid sales found.
                         </TableCell>
                       </TableRow>
@@ -770,6 +802,8 @@ export default function PNLPage() {
                       <TableHead className="font-bold text-xs uppercase">Customer</TableHead>
                       <TableHead className="font-bold text-xs uppercase">Date</TableHead>
                       <TableHead className="text-right font-bold text-xs uppercase">Amount</TableHead>
+                      <TableHead className="text-right font-bold text-xs uppercase">Purchase Price</TableHead>
+                      <TableHead className="text-right font-bold text-xs uppercase">Expense</TableHead>
                       <TableHead className="text-right font-bold text-xs uppercase">Paid</TableHead>
                       <TableHead className="text-right font-bold text-xs uppercase">Balance</TableHead>
                       <TableHead className="font-bold text-xs uppercase">Due Date</TableHead>
@@ -780,12 +814,17 @@ export default function PNLPage() {
                       const paidAmount = getPaidAmount(t.id);
                       const balance = getRemainingBalance(t);
                       const company = getCompany(t.companyId);
+                      const purchaseInfo = getPurchaseFromSerialNumber(t.serialNumber);
+                      const expenseAmount = getTotalExpenseBySerialNumber(t.serialNumber);
+                      const profitLoss = paidAmount - purchaseInfo.price - expenseAmount;
                       return (
                         <TableRow key={t.id}>
                           <TableCell className="font-medium">{t.serialNumber}</TableCell>
                           <TableCell>{getCompanyName(t.companyId)}</TableCell>
                           <TableCell className="text-muted-foreground">{formatDate(t.date)}</TableCell>
                           <TableCell className="text-right">{formatCurrency(t.totalAmount)}</TableCell>
+                          <TableCell className="text-right text-muted-foreground">{formatCurrency(purchaseInfo.price)}</TableCell>
+                          <TableCell className="text-right text-muted-foreground">{formatCurrency(expenseAmount)}</TableCell>
                           <TableCell className="text-right text-muted-foreground">{formatCurrency(paidAmount)}</TableCell>
                           <TableCell className="text-right font-semibold text-amber-600">{formatCurrency(balance)}</TableCell>
                           <TableCell className="text-muted-foreground">
@@ -796,7 +835,7 @@ export default function PNLPage() {
                     })}
                     {filteredSalesPending.length === 0 && (
                       <TableRow>
-                        <TableCell colSpan={7} className="h-24 text-center text-muted-foreground">
+                        <TableCell colSpan={9} className="h-24 text-center text-muted-foreground">
                           No pending sales found.
                         </TableCell>
                       </TableRow>
@@ -841,6 +880,8 @@ export default function PNLPage() {
                       <TableHead className="font-bold text-xs uppercase">Customer</TableHead>
                       <TableHead className="font-bold text-xs uppercase">Date</TableHead>
                       <TableHead className="text-right font-bold text-xs uppercase">Amount</TableHead>
+                      <TableHead className="text-right font-bold text-xs uppercase">Purchase Price</TableHead>
+                      <TableHead className="text-right font-bold text-xs uppercase">Expense</TableHead>
                       <TableHead className="text-right font-bold text-xs uppercase">Paid</TableHead>
                       <TableHead className="text-right font-bold text-xs uppercase">Balance</TableHead>
                       <TableHead className="font-bold text-xs uppercase">Days Overdue</TableHead>
@@ -851,12 +892,17 @@ export default function PNLPage() {
                       const paidAmount = getPaidAmount(t.id);
                       const balance = getRemainingBalance(t);
                       const daysOverdue = getDaysOverdue(t.date, getPaymentTerms(t.companyId));
+                      const purchaseInfo = getPurchaseFromSerialNumber(t.serialNumber);
+                      const expenseAmount = getTotalExpenseBySerialNumber(t.serialNumber);
+                      const profitLoss = paidAmount - purchaseInfo.price - expenseAmount;
                       return (
                         <TableRow key={t.id}>
                           <TableCell className="font-medium">{t.serialNumber}</TableCell>
                           <TableCell>{getCompanyName(t.companyId)}</TableCell>
                           <TableCell className="text-muted-foreground">{formatDate(t.date)}</TableCell>
                           <TableCell className="text-right">{formatCurrency(t.totalAmount)}</TableCell>
+                          <TableCell className="text-right text-muted-foreground">{formatCurrency(purchaseInfo.price)}</TableCell>
+                          <TableCell className="text-right text-muted-foreground">{formatCurrency(expenseAmount)}</TableCell>
                           <TableCell className="text-right text-muted-foreground">{formatCurrency(paidAmount)}</TableCell>
                           <TableCell className="text-right font-semibold text-red-600">{formatCurrency(balance)}</TableCell>
                           <TableCell>
@@ -869,7 +915,7 @@ export default function PNLPage() {
                     })}
                     {filteredSalesLoss.length === 0 && (
                       <TableRow>
-                        <TableCell colSpan={7} className="h-24 text-center text-muted-foreground">
+                        <TableCell colSpan={9} className="h-24 text-center text-muted-foreground">
                           No overdue sales found.
                         </TableCell>
                       </TableRow>

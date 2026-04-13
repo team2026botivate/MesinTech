@@ -6,6 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { ReturnForm } from '@/components/return-form';
+import { Package, Truck } from 'lucide-react';
 import { useData } from '@/lib/data-context';
 import { formatCurrency, formatDate } from '@/lib/format';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -22,6 +23,7 @@ import { cn } from '@/lib/utils';
 
 export default function ReturnsPage() {
   const { returns, transactions, companies, isLoaded } = useData();
+  const [activeTab, setActiveTab] = useState<'sales' | 'purchase'>('sales');
   const [searchQuery, setSearchQuery] = useState('');
   const [filterType, setFilterType] = useState<'all' | 'sales' | 'purchase'>('all');
   const [statusFilter, setStatusFilter] = useState<string>('all');
@@ -36,9 +38,9 @@ export default function ReturnsPage() {
     return transaction?.serialNumber || 'N/A';
   };
 
-  const filteredReturns = useMemo(() => {
+const filteredReturns = useMemo(() => {
     return returns.filter((r) => {
-      const matchesType = filterType === 'all' || r.type === (filterType === 'sales' ? 'sale' : 'purchase');
+      const matchesType = activeTab === 'sales' ? r.returnType === 'sales' : r.returnType === 'purchase';
       const matchesSearch = 
         searchQuery === '' || 
         r.returnNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -49,7 +51,7 @@ export default function ReturnsPage() {
 
       return matchesType && matchesSearch && matchesStatus && matchesCompany;
     });
-  }, [returns, filterType, searchQuery, statusFilter, companyFilter, companies]);
+  }, [returns, activeTab, searchQuery, statusFilter, companyFilter, companies]);
 
   const salesReturnsTotal = returns
     .filter((r) => r.returnType === 'sales')
@@ -68,8 +70,8 @@ export default function ReturnsPage() {
   }
 
   const relevantCompanies = companies.filter(c => {
-    if (filterType === 'sales') return c.type === 'customer';
-    if (filterType === 'purchase') return c.type === 'supplier';
+    if (activeTab === 'sales') return c.type === 'customer';
+    if (activeTab === 'purchase') return c.type === 'supplier';
     return true;
   });
 
@@ -80,31 +82,47 @@ export default function ReturnsPage() {
           <h1 className="text-2xl font-bold tracking-tight text-foreground">Returns</h1>
           <p className="text-sm text-muted-foreground">Manage and track all sales and purchase returns.</p>
         </div>
-        <ReturnForm />
+        <ReturnForm defaultReturnType={activeTab} />
       </div>
 
-      <div className="grid gap-3 md:grid-cols-2">
-        <Card className="bg-primary/5 border-primary/10 p-3 flex flex-row items-center justify-between overflow-hidden relative group">
-          <div className="absolute -right-4 -top-4 bg-primary/10 w-16 h-16 rounded-full blur-2xl group-hover:bg-primary/20 transition-colors" />
-          <div className="space-y-0.5 relative z-10">
-            <p className="text-[10px] uppercase tracking-wider font-bold text-primary">Sales Returns Value</p>
-            <p className="text-[10px] text-muted-foreground">
-              {returns.filter((r) => r.returnType === 'sales').length} items returned by customers
-            </p>
-          </div>
-          <div className="text-xl font-bold relative z-10">{formatCurrency(salesReturnsTotal)}</div>
-        </Card>
+      <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as 'sales' | 'purchase')} className="w-full">
+        <TabsList className="grid w-full max-w-md grid-cols-2 h-11 bg-muted/50">
+          <TabsTrigger value="sales" className="flex items-center gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+            <Package className="w-4 h-4" />
+            Sales Return
+          </TabsTrigger>
+          <TabsTrigger value="purchase" className="flex items-center gap-2 data-[state=active]:bg-secondary data-[state=active]:text-secondary-foreground">
+            <Truck className="w-4 h-4" />
+            Purchase Return
+          </TabsTrigger>
+        </TabsList>
+      </Tabs>
 
-        <Card className="bg-secondary/5 border-secondary/10 p-3 flex flex-row items-center justify-between overflow-hidden relative group">
-          <div className="absolute -right-4 -top-4 bg-secondary/10 w-16 h-16 rounded-full blur-2xl group-hover:bg-secondary/20 transition-colors" />
-          <div className="space-y-0.5 relative z-10">
-            <p className="text-[10px] uppercase tracking-wider font-bold text-muted-foreground">Purchase Returns Value</p>
-            <p className="text-[10px] text-muted-foreground">
-              {returns.filter((r) => r.returnType === 'purchase').length} items returned to suppliers
-            </p>
-          </div>
-          <div className="text-xl font-bold relative z-10">{formatCurrency(purchaseReturnsTotal)}</div>
-        </Card>
+      <div className="grid gap-3 md:grid-cols-2">
+        {activeTab === 'sales' && (
+          <Card className="bg-primary/5 border-primary/10 p-3 flex flex-row items-center justify-between overflow-hidden relative group md:col-span-2">
+            <div className="absolute -right-4 -top-4 bg-primary/10 w-16 h-16 rounded-full blur-2xl group-hover:bg-primary/20 transition-colors" />
+            <div className="space-y-0.5 relative z-10">
+              <p className="text-[10px] uppercase tracking-wider font-bold text-primary">Sales Returns Value</p>
+              <p className="text-[10px] text-muted-foreground">
+                {returns.filter((r) => r.returnType === 'sales').length} items returned by customers
+              </p>
+            </div>
+            <div className="text-xl font-bold relative z-10">{formatCurrency(salesReturnsTotal)}</div>
+          </Card>
+        )}
+        {activeTab === 'purchase' && (
+          <Card className="bg-secondary/5 border-secondary/10 p-3 flex flex-row items-center justify-between overflow-hidden relative group md:col-span-2">
+            <div className="absolute -right-4 -top-4 bg-secondary/10 w-16 h-16 rounded-full blur-2xl group-hover:bg-secondary/20 transition-colors" />
+            <div className="space-y-0.5 relative z-10">
+              <p className="text-[10px] uppercase tracking-wider font-bold text-muted-foreground">Purchase Returns Value</p>
+              <p className="text-[10px] text-muted-foreground">
+                {returns.filter((r) => r.returnType === 'purchase').length} items returned to suppliers
+              </p>
+            </div>
+            <div className="text-xl font-bold relative z-10">{formatCurrency(purchaseReturnsTotal)}</div>
+          </Card>
+        )}
       </div>
 
       <Card>
@@ -130,17 +148,6 @@ export default function ReturnsPage() {
               </div>
               
               <div className="flex flex-wrap gap-2">
-                <Select value={filterType} onValueChange={(v) => setFilterType(v as any)}>
-                  <SelectTrigger className="w-[130px] bg-background/50 border-muted-foreground/20">
-                    <SelectValue placeholder="All types" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Types</SelectItem>
-                    <SelectItem value="sales">Sales</SelectItem>
-                    <SelectItem value="purchase">Purchase</SelectItem>
-                  </SelectContent>
-                </Select>
-
                 <Select value={statusFilter} onValueChange={setStatusFilter}>
                   <SelectTrigger className="w-[130px] bg-background/50 border-muted-foreground/20">
                     <Filter className="h-3.5 w-3.5 mr-2 opacity-50" />

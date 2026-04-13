@@ -2154,7 +2154,7 @@ export const demoUsers: User[] = [
     password: 'admin123',
     name: 'Admin User',
     role: 'admin',
-    accessibleModules: ['/home', '/pnl', '/sales', '/purchases', '/inventory', '/returns', '/expenses', '/master', '/payments', '/notifications', '/settings'],
+    accessibleModules: ['/home', '/pnl', '/bills', '/sales', '/purchases', '/inventory', '/returns', '/expenses', '/master', '/payments', '/notifications', '/settings'],
   },
   {
     id: 'u2',
@@ -2162,7 +2162,7 @@ export const demoUsers: User[] = [
     password: 'user123',
     name: 'Standard User',
     role: 'user',
-    accessibleModules: ['/home', '/pnl', '/sales', '/inventory', '/returns', '/master', '/notifications'],
+    accessibleModules: ['/home', '/pnl', '/bills', '/sales', '/inventory', '/returns', '/master', '/notifications'],
   },
 ];
 
