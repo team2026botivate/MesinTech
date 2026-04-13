@@ -386,3 +386,66 @@ export function useData() {
   }
   return context;
 }
+
+export type ProductStockMetrics = {
+  openingQuantity: number;
+  sales: number;
+  purchase: number;
+  salesReturn: number;
+  purchaseReturn: number;
+  inTransit: number;
+  liveStock: number;
+  stockValue: number;
+};
+
+export function getProductStockMetrics(
+  productId: string,
+  product: Product,
+  transactions: Transaction[],
+  returns: Return[]
+): ProductStockMetrics {
+  const productTransactions = transactions.filter(t => 
+    t.status === 'confirmed' && t.lineItems?.some(li => li.productId === productId)
+  );
+
+  const sales = productTransactions
+    .filter(t => t.type === 'sale')
+    .reduce((sum, t) => {
+      const item = t.lineItems?.find(li => li.productId === productId);
+      return sum + (item?.quantity || 0);
+    }, 0);
+
+  const purchase = productTransactions
+    .filter(t => t.type === 'purchase')
+    .reduce((sum, t) => {
+      const item = t.lineItems?.find(li => li.productId === productId);
+      return sum + (item?.quantity || 0);
+    }, 0);
+
+  const approvedReturns = returns.filter(r => r.status === 'approved');
+  
+  const salesReturn = approvedReturns
+    .filter(r => r.type === 'sale')
+    .reduce((sum, r) => {
+      const item = r.lineItems?.find(li => li.productId === productId);
+      return sum + (item?.quantity || 0);
+    }, 0);
+
+  const purchaseReturn = approvedReturns
+    .filter(r => r.type === 'purchase')
+    .reduce((sum, r) => {
+      const item = r.lineItems?.find(li => li.productId === productId);
+      return sum + (item?.quantity || 0);
+    }, 0);
+
+  return {
+    openingQuantity: product.openingStock || 0,
+    sales,
+    purchase,
+    salesReturn,
+    purchaseReturn,
+    inTransit: product.inTransit || 0,
+    liveStock: product.stock,
+    stockValue: product.stock * product.purchasePrice,
+  };
+}

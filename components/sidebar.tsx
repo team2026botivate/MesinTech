@@ -17,17 +17,16 @@ import {
   Settings as SettingsIcon,
   Truck,
   Building2,
-  TrendingUp
+  TrendingUp,
+  ClipboardList
 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { cn } from '@/lib/utils';
 
 const navItems = [
   { href: '/home', label: 'Home', icon: Home },
   { href: '/pnl', label: 'Profit & Loss', icon: TrendingUp },
   { href: '/sales', label: 'Sales', icon: FileText },
   { href: '/purchases', label: 'Purchases', icon: Package },
+  { href: '/inventory', label: 'Inventory', icon: ClipboardList },
   { href: '/returns', label: 'Returns', icon: RotateCcw },
   { href: '/expenses', label: 'Expenses', icon: Zap },
   { href: '/master', label: 'Master', icon: Building2 },

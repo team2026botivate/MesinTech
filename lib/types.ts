@@ -215,6 +215,7 @@ export type Product = {
   category: string;
   unit: 'pcs' | 'kg' | 'ltr' | 'box' | 'set' | 'meter' | 'pair';
   openingStock?: number;
+  inTransit?: number;
   stock: number;
   minStockAlert: number;
   purchasePrice: number;

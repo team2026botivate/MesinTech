@@ -19,7 +19,8 @@ import {
   Settings as SettingsIcon,
   Truck,
   Building2,
-  TrendingUp
+  TrendingUp,
+  ClipboardList
 } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
@@ -35,7 +36,7 @@ const navItems = [
   { href: '/returns', label: 'Returns', icon: RotateCcw },
   { href: '/expenses', label: 'Expenses', icon: Zap },
   { href: '/master', label: 'Master', icon: Building2 },
-  { href: '/inventory', label: 'Inventory', icon: Archive },
+  { href: '/inventory', label: 'Inventory', icon: ClipboardList },
   { href: '/payments', label: 'Payments', icon: DollarSign },
   { href: '/notifications', label: 'Notifications', icon: Bell },
   { href: '/settings', label: 'Settings', icon: SettingsIcon },

@@ -43,11 +43,13 @@ import { Product, Company } from '@/lib/types';
 import { ProductForm } from '@/components/product-form';
 import { CompanyForm } from '@/components/company-form';
 import { formatCurrency } from '@/lib/format';
+import { getProductStockMetrics } from '@/lib/data-context';
 
 export default function InventoryMasterPage() {
   const { 
     products, addProduct, updateProduct, deleteProduct,
     companies, updateCompany,
+    transactions, returns,
     isLoaded 
   } = useData();
 
@@ -168,7 +170,14 @@ export default function InventoryMasterPage() {
                       <TableHead className="font-bold text-xs uppercase tracking-wider py-3 pl-6">Product Details</TableHead>
                       <TableHead className="font-bold text-xs uppercase tracking-wider">Specification</TableHead>
                       <TableHead className="font-bold text-xs uppercase tracking-wider text-right">Pricing (GST)</TableHead>
-                      <TableHead className="font-bold text-xs uppercase tracking-wider text-center">Stock Level (O/C)</TableHead>
+                      <TableHead className="font-bold text-xs uppercase tracking-wider text-center">Opening Qty</TableHead>
+                      <TableHead className="font-bold text-xs uppercase tracking-wider text-center">Sales</TableHead>
+                      <TableHead className="font-bold text-xs uppercase tracking-wider text-center">Purchase</TableHead>
+                      <TableHead className="font-bold text-xs uppercase tracking-wider text-center">Sales Return</TableHead>
+                      <TableHead className="font-bold text-xs uppercase tracking-wider text-center">Purchase Return</TableHead>
+                      <TableHead className="font-bold text-xs uppercase tracking-wider text-center">In-Transit</TableHead>
+                      <TableHead className="font-bold text-xs uppercase tracking-wider text-center">Live Stock</TableHead>
+                      <TableHead className="font-bold text-xs uppercase tracking-wider text-right">Stock Value</TableHead>
                       <TableHead className="font-bold text-xs uppercase tracking-wider text-right pr-6">Actions</TableHead>
                     </TableRow>
                   </TableHeader>
@@ -208,19 +217,42 @@ export default function InventoryMasterPage() {
                           </div>
                         </TableCell>
                         <TableCell className="text-center">
-                          <div className="flex items-center justify-center gap-4">
-                            <div className="flex flex-col items-center">
-                              <span className="text-[9px] text-muted-foreground uppercase font-black opacity-40">OPEN</span>
-                              <span className="text-xs font-bold">{p.openingStock || 0}</span>
-                            </div>
-                            <ArrowLeftRight className="w-3 h-3 text-muted-foreground/20" />
-                            <div className="flex flex-col items-center">
-                              <span className="text-[9px] text-primary uppercase font-black">LIVE</span>
-                              <span className={`text-xs font-bold ${p.stock <= p.minStockAlert ? 'text-destructive' : 'text-foreground'}`}>
-                                {p.stock}
-                              </span>
-                            </div>
-                          </div>
+                          <span className="text-xs font-medium">{p.openingStock || 0}</span>
+                        </TableCell>
+                        <TableCell className="text-center">
+                          <span className="text-xs font-medium text-red-600">
+                            {getProductStockMetrics(p.id, p, transactions, returns).sales}
+                          </span>
+                        </TableCell>
+                        <TableCell className="text-center">
+                          <span className="text-xs font-medium text-green-600">
+                            {getProductStockMetrics(p.id, p, transactions, returns).purchase}
+                          </span>
+                        </TableCell>
+                        <TableCell className="text-center">
+                          <span className="text-xs font-medium text-orange-600">
+                            {getProductStockMetrics(p.id, p, transactions, returns).salesReturn}
+                          </span>
+                        </TableCell>
+                        <TableCell className="text-center">
+                          <span className="text-xs font-medium text-amber-600">
+                            {getProductStockMetrics(p.id, p, transactions, returns).purchaseReturn}
+                          </span>
+                        </TableCell>
+                        <TableCell className="text-center">
+                          <span className="text-xs font-medium text-blue-600">
+                            {getProductStockMetrics(p.id, p, transactions, returns).inTransit}
+                          </span>
+                        </TableCell>
+                        <TableCell className="text-center">
+                          <span className={`text-xs font-bold ${p.stock <= p.minStockAlert ? 'text-destructive' : 'text-foreground'}`}>
+                            {p.stock}
+                          </span>
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <span className="text-xs font-medium">
+                            {formatCurrency(getProductStockMetrics(p.id, p, transactions, returns).stockValue)}
+                          </span>
                         </TableCell>
                         <TableCell className="text-right pr-6">
                           <div className="flex items-center justify-end gap-1">
