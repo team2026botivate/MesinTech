@@ -23,48 +23,41 @@ export default function BillsPage() {
   const [sortField, setSortField] = useState<'date' | 'amount'>('date');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
 
-  if (!isLoaded) {
-    return (
-      <div className="flex h-screen items-center justify-center">
-        <p className="text-muted-foreground">Loading...</p>
-      </div>
-    );
-  }
-
   const allTransactions = transactions;
 
-  const getCompanyName = (companyId: string) => {
-    return companies.find((c) => c.id === companyId)?.name || 'Unknown';
+  const getPaymentStatus = (transactionId: string) => {
+    const transaction = transactions.find((t) => t.id === transactionId);
+    if (!transaction) return 'pending';
+    const paid = payments.filter((p) => p.linkedTransactionId === transactionId).reduce((sum, p) => sum + p.amount, 0);
+    const balance = (transaction.totalAmount || 0) - paid;
+    if (balance <= 0) return 'paid';
+    if (transaction.amountPaid > 0) return 'partial';
+    return 'pending';
   };
 
   const getRemainingBalance = (transactionId: string) => {
     const transaction = transactions.find((t) => t.id === transactionId);
     if (!transaction) return 0;
-    const paid = payments
-      .filter((p) => p.linkedTransactionId === transactionId)
-      .reduce((sum, p) => sum + p.amount, 0);
+    const paid = payments.filter((p) => p.linkedTransactionId === transactionId).reduce((sum, p) => sum + p.amount, 0);
     return (transaction.totalAmount || 0) - paid;
-  };
-
-  const getPaymentStatus = (transactionId: string) => {
-    const balance = getRemainingBalance(transactionId);
-    if (balance <= 0) return 'paid';
-    const transaction = transactions.find((t) => t.id === transactionId);
-    if (transaction && transaction.amountPaid > 0) return 'partial';
-    return 'pending';
   };
 
   const filteredTransactions = useMemo(() => {
     return allTransactions
       .filter((t) => {
+        const companyName = companies.find((c) => c.id === t.companyId)?.name || 'Unknown';
         const matchesSearch =
           searchQuery === '' ||
           t.serialNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          getCompanyName(t.companyId).toLowerCase().includes(searchQuery.toLowerCase());
+          companyName.toLowerCase().includes(searchQuery.toLowerCase());
 
         const matchesType = typeFilter === 'all' || t.type === typeFilter;
 
-        const status = getPaymentStatus(t.id);
+        const balance = (transactions.find((tr) => tr.id === t.id)?.totalAmount || 0) - payments.filter((p) => p.linkedTransactionId === t.id).reduce((sum, p) => sum + p.amount, 0);
+        let status = 'pending';
+        if (balance <= 0) status = 'paid';
+        else if ((transactions.find((tr) => tr.id === t.id)?.amountPaid || 0) > 0) status = 'partial';
+        
         const matchesStatus = statusFilter === 'all' || status === statusFilter;
 
         return matchesSearch && matchesType && matchesStatus;
@@ -81,6 +74,14 @@ export default function BillsPage() {
         }
       });
   }, [allTransactions, searchQuery, typeFilter, statusFilter, sortField, sortOrder, companies, payments, transactions]);
+
+  if (!isLoaded) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <p className="text-muted-foreground">Loading...</p>
+      </div>
+    );
+  }
 
   const totalSales = filteredTransactions.filter((t) => t.type === 'sale').reduce((sum, t) => sum + t.totalAmount, 0);
   const totalPurchases = filteredTransactions.filter((t) => t.type === 'purchase').reduce((sum, t) => sum + t.totalAmount, 0);
@@ -209,10 +210,12 @@ export default function BillsPage() {
                   </TableRow>
                 ) : (
                   filteredTransactions.map((transaction) => {
-                    const status = getPaymentStatus(transaction.id);
+                    const companyName = companies.find((c) => c.id === transaction.companyId)?.name || 'Unknown';
                     const paidAmount = payments
                       .filter((p) => p.linkedTransactionId === transaction.id)
                       .reduce((sum, p) => sum + p.amount, 0);
+                    const balance = (transaction.totalAmount || 0) - paidAmount;
+                    const status = balance <= 0 ? 'paid' : transaction.amountPaid > 0 ? 'partial' : 'pending';
 
                     return (
                       <TableRow key={transaction.id}>
@@ -225,13 +228,13 @@ export default function BillsPage() {
                           </Badge>
                         </TableCell>
                         <TableCell className="font-medium">{transaction.serialNumber}</TableCell>
-                        <TableCell>{getCompanyName(transaction.companyId)}</TableCell>
+                        <TableCell>{companyName}</TableCell>
                         <TableCell className="text-muted-foreground">{formatDate(transaction.date)}</TableCell>
                         <TableCell className="text-right font-medium">{formatCurrency(transaction.totalAmount)}</TableCell>
                         <TableCell className="text-right text-green-600">{formatCurrency(paidAmount)}</TableCell>
                         <TableCell className="text-right">
-                          <span className={getRemainingBalance(transaction.id) > 0 ? 'text-amber-600 font-semibold' : 'text-emerald-600'}>
-                            {formatCurrency(getRemainingBalance(transaction.id))}
+                          <span className={balance > 0 ? 'text-amber-600 font-semibold' : 'text-emerald-600'}>
+                            {formatCurrency(balance)}
                           </span>
                         </TableCell>
                         <TableCell>

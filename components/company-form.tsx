@@ -333,7 +333,129 @@ export function CompanyForm({
 
               <Separator className="opacity-50" />
 
-              {/* Section 3: Geography */}
+              {/* Section 4: GST & Tax Details */}
+              <div className="space-y-6">
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="h-4 w-1 bg-amber-500 rounded-full" />
+                  <h3 className="text-sm font-bold text-foreground uppercase tracking-tight">GST & Tax Details</h3>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+                  <div className="space-y-2">
+                    <Label htmlFor="gstin" className="text-xs font-bold uppercase opacity-70">GSTIN Number</Label>
+                    <Input
+                      id="gstin"
+                      type="text"
+                      placeholder="e.g., 27AABCP1234A1Z1"
+                      value={formData.gstin}
+                      onChange={(e) => setFormData({ ...formData, gstin: e.target.value })}
+                      className="bg-background border-muted-foreground/20 h-10 uppercase"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="pan" className="text-xs font-bold uppercase opacity-70">PAN Number</Label>
+                    <Input
+                      id="pan"
+                      type="text"
+                      placeholder="e.g., AABCP1234A"
+                      value={formData.pan}
+                      onChange={(e) => setFormData({ ...formData, pan: e.target.value })}
+                      className="bg-background border-muted-foreground/20 h-10 uppercase"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="paymentTermsDays" className="text-xs font-bold uppercase opacity-70">Payment Terms (Days)</Label>
+                    <Input
+                      id="paymentTermsDays"
+                      type="number"
+                      placeholder="e.g., 30"
+                      value={formData.paymentTermsDays}
+                      onChange={(e) => setFormData({ ...formData, paymentTermsDays: e.target.value })}
+                      className="bg-background border-muted-foreground/20 h-10"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="creditLimit" className="text-xs font-bold uppercase opacity-70">Credit Limit</Label>
+                    <Input
+                      id="creditLimit"
+                      type="number"
+                      placeholder="e.g., 500000"
+                      value={formData.creditLimit}
+                      onChange={(e) => setFormData({ ...formData, creditLimit: e.target.value })}
+                      className="bg-background border-muted-foreground/20 h-10"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <Separator className="opacity-50" />
+
+              {/* Section 5: Bank Details */}
+              {(formData.bankName || formData.accountNumber || formData.ifsc) && (
+                <div className="space-y-6">
+                  <div className="flex items-center gap-2 mb-2">
+                    <div className="h-4 w-1 bg-blue-500 rounded-full" />
+                    <h3 className="text-sm font-bold text-foreground uppercase tracking-tight">Bank Details</h3>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+                    <div className="space-y-2">
+                      <Label htmlFor="bankName" className="text-xs font-bold uppercase opacity-70">Bank Name</Label>
+                      <Input
+                        id="bankName"
+                        type="text"
+                        placeholder="e.g., HDFC Bank"
+                        value={formData.bankName}
+                        onChange={(e) => setFormData({ ...formData, bankName: e.target.value })}
+                        className="bg-background border-muted-foreground/20 h-10"
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="accountNumber" className="text-xs font-bold uppercase opacity-70">Account Number</Label>
+                      <Input
+                        id="accountNumber"
+                        type="text"
+                        placeholder="e.g., 1234567890"
+                        value={formData.accountNumber}
+                        onChange={(e) => setFormData({ ...formData, accountNumber: e.target.value })}
+                        className="bg-background border-muted-foreground/20 h-10"
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="ifsc" className="text-xs font-bold uppercase opacity-70">IFSC Code</Label>
+                      <Input
+                        id="ifsc"
+                        type="text"
+                        placeholder="e.g., HDFC0001234"
+                        value={formData.ifsc}
+                        onChange={(e) => setFormData({ ...formData, ifsc: e.target.value })}
+                        className="bg-background border-muted-foreground/20 h-10 uppercase"
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="branch" className="text-xs font-bold uppercase opacity-70">Branch</Label>
+                      <Input
+                        id="branch"
+                        type="text"
+                        placeholder="e.g., Main Branch"
+                        value={formData.branch}
+                        onChange={(e) => setFormData({ ...formData, branch: e.target.value })}
+                        className="bg-background border-muted-foreground/20 h-10"
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              <Separator className="opacity-50" />
+
+              {/* Section 6: Geographic */}
               <div className="space-y-6">
                 <div className="flex items-center gap-2 mb-2">
                   <div className="h-4 w-1 bg-emerald-500 rounded-full" />

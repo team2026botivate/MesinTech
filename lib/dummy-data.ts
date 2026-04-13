@@ -444,103 +444,7 @@ export const dummyTransactions: Transaction[] = [
     dueDate: '2025-11-04',
     paymentStatus: 'paid',
     status: 'confirmed',
-  },
-  {
-    id: 't1b',
-    type: 'sale',
-    serialNumber: 'SR-2025-002',
-    companyId: 'c1',
-    companyName: 'Precision Engineering Shoppe',
-    billingAddress: 'G-12, Industrial Estate, Phase 3, Andheri West, Mumbai-400053',
-    placeOfSupply: 'Maharashtra',
-    lineItems: [
-      { id: 'li1b', productId: 'prd5', description: 'Industrial Pressure Gauge', quantity: 10, unit: 'pcs', unitPrice: 2400, gstRate: 18, lineTotal: 24000 },
-    ],
-    subtotal: 24000,
-    taxableAmount: 24000,
-    cgstAmount: 2160,
-    sgstAmount: 2160,
-    totalGst: 4320,
-    totalAmount: 28320,
-    amountPaid: 28320,
-    balanceDue: 0,
-    date: '2025-10-08',
-    dueDate: '2025-10-23',
-    paymentStatus: 'paid',
-    status: 'confirmed',
-  },
-  {
-    id: 't1c',
-    type: 'sale',
-    serialNumber: 'SR-2025-003',
-    companyId: 'c3',
-    companyName: 'Shivam Steel Traders',
-    billingAddress: 'Plot No. 45, GIDC Industrial Estate, Ahmedabad-382445',
-    placeOfSupply: 'Gujarat',
-    lineItems: [
-      { id: 'li1c', productId: 'prd9', description: 'Ball Valve 25mm', quantity: 20, unit: 'pcs', unitPrice: 600, gstRate: 18, lineTotal: 12000 },
-    ],
-    subtotal: 12000,
-    taxableAmount: 12000,
-    cgstAmount: 1080,
-    sgstAmount: 1080,
-    totalGst: 2160,
-    totalAmount: 14160,
-    amountPaid: 0,
-    balanceDue: 14160,
-    date: '2025-10-12',
-    dueDate: '2025-11-11',
-    paymentStatus: 'pending',
-    status: 'confirmed',
-  },
-  {
-    id: 't2',
-    type: 'purchase',
-    serialNumber: 'PO-2025-001',
-    supplierInvoiceNumber: 'PREC-987',
-    companyId: 'c1',
-    companyName: 'Precision Engineering Shoppe',
-    billingAddress: 'G-12, Industrial Estate, Phase 3, Andheri West, Mumbai-400053',
-    lineItems: [
-      { id: 'li3', productId: 'prd1', description: 'Centrifugal Pump CP-202', quantity: 10, unit: 'pcs', unitPrice: 22000, gstRate: 18, lineTotal: 220000 },
-    ],
-    subtotal: 220000,
-    taxableAmount: 220000,
-    cgstAmount: 19800,
-    sgstAmount: 19800,
-    totalGst: 39600,
-    totalAmount: 259600,
-    amountPaid: 259600,
-    balanceDue: 0,
-    date: '2025-10-01',
-    dueDate: '2025-10-16',
-    paymentStatus: 'paid',
-    status: 'confirmed',
-  },
-  // NOVEMBER 2025
-  {
-    id: 't3',
-    type: 'sale',
-    serialNumber: 'SR-2025-004',
-    companyId: 'c4',
-    companyName: 'MMRDA - Metro Line 3',
-    billingAddress: 'Bandra-Kurla Complex, Bandra (E), Mumbai-400051',
-    placeOfSupply: 'Maharashtra',
-    lineItems: [
-      { id: 'li4', productId: 'prd2', description: 'Carbon Steel Pipe 4" (6m)', quantity: 100, unit: 'meter', unitPrice: 4500, gstRate: 18, lineTotal: 450000 },
-    ],
-    subtotal: 450000,
-    taxableAmount: 450000,
-    cgstAmount: 40500,
-    sgstAmount: 40500,
-    totalGst: 81000,
-    totalAmount: 531000,
-    amountPaid: 531000,
-    balanceDue: 0,
-    date: '2025-11-10',
-    dueDate: '2025-12-01',
-    paymentStatus: 'paid',
-    status: 'confirmed',
+    paymentMethod: 'bill',
   },
   {
     id: 't3b',
@@ -565,33 +469,10 @@ export const dummyTransactions: Transaction[] = [
     dueDate: '2025-11-30',
     paymentStatus: 'paid',
     status: 'confirmed',
+    paymentMethod: 'bill',
   },
   {
-    id: 't3c',
-    type: 'sale',
-    serialNumber: 'SR-2025-006',
-    companyId: 'c3',
-    companyName: 'Shivam Steel Traders',
-    billingAddress: 'Plot No. 45, GIDC Industrial Estate, Ahmedabad-382445',
-    placeOfSupply: 'Gujarat',
-    lineItems: [
-      { id: 'li3c', productId: 'prd5', description: 'Industrial Pressure Gauge', quantity: 8, unit: 'pcs', unitPrice: 2400, gstRate: 18, lineTotal: 19200 },
-    ],
-    subtotal: 19200,
-    taxableAmount: 19200,
-    cgstAmount: 1728,
-    sgstAmount: 1728,
-    totalGst: 3456,
-    totalAmount: 22656,
-    amountPaid: 22656,
-    balanceDue: 0,
-    date: '2025-11-20',
-    dueDate: '2025-12-20',
-    paymentStatus: 'paid',
-    status: 'confirmed',
-  },
-  {
-    id: 't4',
+    id: 't1c',
     type: 'sale',
     serialNumber: 'SR-2025-003',
     companyId: 'c7',
@@ -614,6 +495,7 @@ export const dummyTransactions: Transaction[] = [
     dueDate: '2025-12-20',
     paymentStatus: 'pending',
     status: 'confirmed',
+    paymentMethod: 'cash',
   },
   {
     id: 't5',
@@ -635,6 +517,7 @@ export const dummyTransactions: Transaction[] = [
     dueDate: '2025-12-15',
     paymentStatus: 'paid',
     status: 'confirmed',
+    paymentMethod: 'bill',
   },
   // DECEMBER 2025
   {
@@ -660,6 +543,7 @@ export const dummyTransactions: Transaction[] = [
     dueDate: '2026-01-04',
     paymentStatus: 'paid',
     status: 'confirmed',
+    paymentMethod: 'bill',
   },
   {
     id: 't6b',
@@ -684,6 +568,7 @@ export const dummyTransactions: Transaction[] = [
     dueDate: '2025-12-27',
     paymentStatus: 'overdue',
     status: 'confirmed',
+    paymentMethod: 'bill',
   },
   {
     id: 't6c',
@@ -708,6 +593,7 @@ export const dummyTransactions: Transaction[] = [
     dueDate: '2026-01-17',
     paymentStatus: 'paid',
     status: 'confirmed',
+    paymentMethod: 'cash',
   },
   {
     id: 't7',
@@ -733,6 +619,7 @@ export const dummyTransactions: Transaction[] = [
     dueDate: '2026-01-14',
     paymentStatus: 'pending',
     status: 'confirmed',
+    paymentMethod: 'bill',
   },
   {
     id: 't8',
@@ -756,6 +643,7 @@ export const dummyTransactions: Transaction[] = [
     dueDate: '2026-01-19',
     paymentStatus: 'pending',
     status: 'confirmed',
+    paymentMethod: 'bill',
   },
   {
     id: 't8b',
@@ -780,6 +668,7 @@ export const dummyTransactions: Transaction[] = [
     dueDate: '2026-01-21',
     paymentStatus: 'paid',
     status: 'confirmed',
+    paymentMethod: 'cash',
   },
   {
     id: 't8c',
@@ -804,6 +693,7 @@ export const dummyTransactions: Transaction[] = [
     dueDate: '2026-02-11',
     paymentStatus: 'pending',
     status: 'confirmed',
+    paymentMethod: 'bill',
   },
   // JANUARY 2026
   {
@@ -830,6 +720,7 @@ export const dummyTransactions: Transaction[] = [
     dueDate: '2026-02-09',
     paymentStatus: 'paid',
     status: 'confirmed',
+    paymentMethod: 'bill',
   },
   {
     id: 't9b',
@@ -854,6 +745,7 @@ export const dummyTransactions: Transaction[] = [
     dueDate: '2026-01-27',
     paymentStatus: 'paid',
     status: 'confirmed',
+    paymentMethod: 'cash',
   },
   {
     id: 't9c',
@@ -878,6 +770,7 @@ export const dummyTransactions: Transaction[] = [
     dueDate: '2026-02-17',
     paymentStatus: 'pending',
     status: 'confirmed',
+    paymentMethod: 'bill',
   },
   {
     id: 't10',
@@ -902,6 +795,7 @@ export const dummyTransactions: Transaction[] = [
     dueDate: '2026-02-14',
     paymentStatus: 'pending',
     status: 'confirmed',
+    paymentMethod: 'bill',
   },
   {
     id: 't11',
@@ -927,6 +821,7 @@ export const dummyTransactions: Transaction[] = [
     dueDate: '2026-02-04',
     paymentStatus: 'paid',
     status: 'confirmed',
+    paymentMethod: 'cash',
   },
   {
     id: 't12',
@@ -951,6 +846,7 @@ export const dummyTransactions: Transaction[] = [
     dueDate: '2026-01-20',
     paymentStatus: 'paid',
     status: 'confirmed',
+    paymentMethod: 'bill',
   },
   // FEBRUARY 2026
   {
@@ -976,6 +872,7 @@ export const dummyTransactions: Transaction[] = [
     dueDate: '2026-02-26',
     paymentStatus: 'overdue',
     status: 'confirmed',
+    paymentMethod: 'bill',
   },
   {
     id: 't13b',
@@ -1000,6 +897,7 @@ export const dummyTransactions: Transaction[] = [
     dueDate: '2026-02-23',
     paymentStatus: 'paid',
     status: 'confirmed',
+    paymentMethod: 'cash',
   },
   {
     id: 't13c',
@@ -1024,6 +922,7 @@ export const dummyTransactions: Transaction[] = [
     dueDate: '2026-03-17',
     paymentStatus: 'paid',
     status: 'confirmed',
+    paymentMethod: 'bill',
   },
   {
     id: 't14',
@@ -1049,6 +948,7 @@ export const dummyTransactions: Transaction[] = [
     dueDate: '2026-03-27',
     paymentStatus: 'paid',
     status: 'confirmed',
+    paymentMethod: 'bill',
   },
   {
     id: 't15',
@@ -1073,6 +973,7 @@ export const dummyTransactions: Transaction[] = [
     dueDate: '2026-03-17',
     paymentStatus: 'pending',
     status: 'confirmed',
+    paymentMethod: 'cash',
   },
   {
     id: 't16',
@@ -1096,6 +997,7 @@ export const dummyTransactions: Transaction[] = [
     dueDate: '2026-04-06',
     paymentStatus: 'pending',
     status: 'confirmed',
+    paymentMethod: 'bill',
   },
   // MARCH 2026
   {
@@ -1122,6 +1024,7 @@ export const dummyTransactions: Transaction[] = [
     dueDate: '2026-03-31',
     paymentStatus: 'overdue',
     status: 'confirmed',
+    paymentMethod: 'bill',
   },
   {
     id: 't17b',
@@ -1146,6 +1049,7 @@ export const dummyTransactions: Transaction[] = [
     dueDate: '2026-03-20',
     paymentStatus: 'overdue',
     status: 'confirmed',
+    paymentMethod: 'cash',
   },
   {
     id: 't17c',
@@ -1170,6 +1074,7 @@ export const dummyTransactions: Transaction[] = [
     dueDate: '2026-04-07',
     paymentStatus: 'paid',
     status: 'confirmed',
+    paymentMethod: 'bill',
   },
   {
     id: 't18',
@@ -1194,6 +1099,7 @@ export const dummyTransactions: Transaction[] = [
     dueDate: '2026-04-09',
     paymentStatus: 'paid',
     status: 'confirmed',
+    paymentMethod: 'bill',
   },
   {
     id: 't19',
@@ -1218,6 +1124,7 @@ export const dummyTransactions: Transaction[] = [
     dueDate: '2026-04-14',
     paymentStatus: 'pending',
     status: 'confirmed',
+    paymentMethod: 'cash',
   },
   {
     id: 't20',
@@ -1242,6 +1149,7 @@ export const dummyTransactions: Transaction[] = [
     dueDate: '2026-04-19',
     paymentStatus: 'paid',
     status: 'confirmed',
+    paymentMethod: 'bill',
   },
   {
     id: 't21',
@@ -1265,6 +1173,7 @@ export const dummyTransactions: Transaction[] = [
     dueDate: '2026-03-20',
     paymentStatus: 'paid',
     status: 'confirmed',
+    paymentMethod: 'bill',
   },
   // APRIL 2026
   {
@@ -1290,6 +1199,7 @@ export const dummyTransactions: Transaction[] = [
     dueDate: '2026-05-16',
     paymentStatus: 'pending',
     status: 'confirmed',
+    paymentMethod: 'cash',
   },
   {
     id: 't22b',
@@ -1314,6 +1224,7 @@ export const dummyTransactions: Transaction[] = [
     dueDate: '2026-04-18',
     paymentStatus: 'paid',
     status: 'confirmed',
+    paymentMethod: 'bill',
   },
   {
     id: 't22c',
@@ -1338,6 +1249,7 @@ export const dummyTransactions: Transaction[] = [
     dueDate: '2026-05-08',
     paymentStatus: 'pending',
     status: 'confirmed',
+    paymentMethod: 'bill',
   },
   {
     id: 't22d',
@@ -1362,6 +1274,7 @@ export const dummyTransactions: Transaction[] = [
     dueDate: '2026-05-10',
     paymentStatus: 'paid',
     status: 'confirmed',
+    paymentMethod: 'cash',
   },
   {
     id: 't22e',
@@ -1386,6 +1299,7 @@ export const dummyTransactions: Transaction[] = [
     dueDate: '2026-05-27',
     paymentStatus: 'pending',
     status: 'confirmed',
+    paymentMethod: 'bill',
   },
   {
     id: 't23',
@@ -1410,6 +1324,7 @@ export const dummyTransactions: Transaction[] = [
     dueDate: '2026-04-20',
     paymentStatus: 'paid',
     status: 'confirmed',
+    paymentMethod: 'bill',
   },
   {
     id: 't24',
@@ -1435,6 +1350,7 @@ export const dummyTransactions: Transaction[] = [
     dueDate: '2026-04-29',
     paymentStatus: 'overdue',
     status: 'confirmed',
+    paymentMethod: 'cash',
   },
   {
     id: 't25',
@@ -1456,6 +1372,7 @@ export const dummyTransactions: Transaction[] = [
     dueDate: '2026-05-01',
     paymentStatus: 'paid',
     status: 'confirmed',
+    paymentMethod: 'bill',
   },
   {
     id: 't26',
@@ -1479,6 +1396,7 @@ export const dummyTransactions: Transaction[] = [
     dueDate: '2026-05-10',
     paymentStatus: 'pending',
     status: 'confirmed',
+    paymentMethod: 'bill',
   },
   {
     id: 't27',
@@ -1503,6 +1421,7 @@ export const dummyTransactions: Transaction[] = [
     dueDate: '2026-05-05',
     paymentStatus: 'pending',
     status: 'confirmed',
+    paymentMethod: 'cash',
   },
   {
     id: 't28',
@@ -1527,6 +1446,7 @@ export const dummyTransactions: Transaction[] = [
     dueDate: '2026-05-10',
     paymentStatus: 'pending',
     status: 'confirmed',
+    paymentMethod: 'bill',
   },
 ];
 
@@ -1973,6 +1893,57 @@ export const dummyExpenses: Expense[] = [
     totalExpense: 15000,
     notes: 'Project completion celebration',
     status: 'approved',
+  },
+  {
+    id: 'e8',
+    expenseNumber: 'EXP-2026-005',
+    expenseType: 'courier',
+    expenseDate: '2026-04-08',
+    courierName: 'DTDC',
+    dispatcherName: 'Suresh',
+    trackingNumber: 'DTDC456789',
+    courierAmount: 450,
+    totalExpense: 450,
+    notes: 'Documents to Reliance Construction',
+    status: 'pending',
+  },
+  {
+    id: 'e9',
+    expenseNumber: 'EXP-2026-006',
+    expenseType: 'travel',
+    expenseDate: '2026-04-10',
+    fromLocation: 'Office',
+    toLocation: 'Ahmedabad',
+    travelMode: 'Car',
+    travelAmount: 2800,
+    tollParkingAmount: 450,
+    purposeOfTravel: 'Shivam Steel meeting',
+    totalExpense: 3250,
+    notes: 'Quarterly business discussion',
+    status: 'pending',
+  },
+  {
+    id: 'e10',
+    expenseNumber: 'EXP-2026-007',
+    expenseType: 'other',
+    expenseDate: '2026-04-12',
+    totalExpense: 5000,
+    notes: 'Office supplies - stationery',
+    status: 'pending',
+  },
+  {
+    id: 'e11',
+    expenseNumber: 'EXP-2026-008',
+    expenseType: 'food',
+    expenseDate: '2026-04-11',
+    mealType: 'lunch',
+    numberOfPeople: 3,
+    vendorName: 'Maharaja Bhai',
+    foodDescription: 'Client meeting - Jindal Steel team',
+    foodAmount: 4200,
+    totalExpense: 4200,
+    notes: 'Business discussion',
+    status: 'pending',
   },
 ];
 

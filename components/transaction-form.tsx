@@ -297,13 +297,20 @@ export function TransactionForm({ type, onClose, editTransaction }: TransactionF
   );
 
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogTrigger asChild>
-        <Button className="bg-primary text-primary-foreground hover:bg-primary/90">
-          <Plus className="w-4 h-4 mr-2" />
-          New {type === 'sale' ? 'Sale' : 'Purchase'}
-        </Button>
-      </DialogTrigger>
+    <Dialog open={isOpen} onOpenChange={(open) => {
+      if (!open) {
+        onClose?.();
+      }
+      setIsOpen(open);
+    }}>
+      {!editTransaction && (
+        <DialogTrigger asChild>
+          <Button className="bg-primary text-primary-foreground hover:bg-primary/90">
+            <Plus className="w-4 h-4 mr-2" />
+            New {type === 'sale' ? 'Sale' : 'Purchase'}
+          </Button>
+        </DialogTrigger>
+      )}
       <DialogContent className="sm:max-w-5xl max-h-[95vh] flex flex-col p-0 overflow-hidden">
         <DialogHeader className="px-6 py-4 border-b">
           <DialogTitle className="text-xl font-bold tracking-tight">

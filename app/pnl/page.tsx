@@ -612,7 +612,6 @@ export default function PNLPage() {
                       <TableHead className="text-right font-bold text-xs uppercase">Paid</TableHead>
                       <TableHead className="text-right font-bold text-xs uppercase">Balance</TableHead>
                       <TableHead className="text-right font-bold text-xs uppercase">Profit/Loss</TableHead>
-                      <TableHead className="font-bold text-xs uppercase">Status</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -664,26 +663,12 @@ export default function PNLPage() {
                             <TableCell className={cn("text-right font-semibold whitespace-nowrap", profitLoss < 0 ? "text-red-600" : "text-emerald-600")}>
                               {formatCurrency(profitLoss)}
                             </TableCell>
-                            <TableCell>
-                              <Badge
-                                variant={status === 'profit' ? 'secondary' : status === 'loss' ? 'destructive' : 'outline'}
-                                className={
-                                  status === 'profit'
-                                    ? 'bg-emerald-100 text-emerald-800 hover:bg-emerald-100'
-                                    : status === 'loss'
-                                    ? 'bg-red-100 text-red-800 hover:bg-red-100'
-                                    : 'bg-amber-100 text-amber-800 hover:bg-amber-100'
-                                }
-                              >
-                                {status === 'profit' ? 'Profit' : status === 'loss' ? 'Loss' : 'Pending'}
-                              </Badge>
-                            </TableCell>
                           </TableRow>
                         );
                       })}
                     {[...salesProfitList, ...salesPendingList, ...salesLossList].length === 0 && (
                       <TableRow>
-                        <TableCell colSpan={12} className="h-24 text-center text-muted-foreground">
+                        <TableCell colSpan={11} className="h-24 text-center text-muted-foreground">
                           No sales transactions found.
                         </TableCell>
                       </TableRow>
@@ -807,6 +792,7 @@ export default function PNLPage() {
                       <TableHead className="text-right font-bold text-xs uppercase">Paid</TableHead>
                       <TableHead className="text-right font-bold text-xs uppercase">Balance</TableHead>
                       <TableHead className="font-bold text-xs uppercase">Due Date</TableHead>
+                      <TableHead className="text-right font-bold text-xs uppercase">Profit/Loss</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -830,12 +816,15 @@ export default function PNLPage() {
                           <TableCell className="text-muted-foreground">
                             {company ? formatDate(calculateDueDate(t.date, company.paymentTermsDays).toISOString()) : '-'}
                           </TableCell>
+                          <TableCell className={cn("text-right font-semibold", profitLoss < 0 ? "text-red-600" : "text-emerald-600")}>
+                            {formatCurrency(profitLoss)}
+                          </TableCell>
                         </TableRow>
                       );
                     })}
                     {filteredSalesPending.length === 0 && (
                       <TableRow>
-                        <TableCell colSpan={9} className="h-24 text-center text-muted-foreground">
+                        <TableCell colSpan={10} className="h-24 text-center text-muted-foreground">
                           No pending sales found.
                         </TableCell>
                       </TableRow>
@@ -885,6 +874,7 @@ export default function PNLPage() {
                       <TableHead className="text-right font-bold text-xs uppercase">Paid</TableHead>
                       <TableHead className="text-right font-bold text-xs uppercase">Balance</TableHead>
                       <TableHead className="font-bold text-xs uppercase">Days Overdue</TableHead>
+                      <TableHead className="text-right font-bold text-xs uppercase">Profit/Loss</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -910,12 +900,15 @@ export default function PNLPage() {
                               {daysOverdue} days
                             </Badge>
                           </TableCell>
+                          <TableCell className={cn("text-right font-semibold", profitLoss < 0 ? "text-red-600" : "text-emerald-600")}>
+                            {formatCurrency(profitLoss)}
+                          </TableCell>
                         </TableRow>
                       );
                     })}
                     {filteredSalesLoss.length === 0 && (
                       <TableRow>
-                        <TableCell colSpan={9} className="h-24 text-center text-muted-foreground">
+                        <TableCell colSpan={10} className="h-24 text-center text-muted-foreground">
                           No overdue sales found.
                         </TableCell>
                       </TableRow>
