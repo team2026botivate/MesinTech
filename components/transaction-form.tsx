@@ -757,7 +757,7 @@ export function TransactionForm({ type, onClose, editTransaction }: TransactionF
             </Button>
             <Button type="submit" className="shadow-sm px-8">
               <Save className="w-4 h-4 mr-2" />
-              {editTransaction ? 'Save' : 'Generate Serial'}
+              Save
             </Button>
           </DialogFooter>
         </form>
