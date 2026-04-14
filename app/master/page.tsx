@@ -171,11 +171,6 @@ export default function InventoryMasterPage() {
                       <TableHead className="font-bold text-xs uppercase tracking-wider">Specification</TableHead>
                       <TableHead className="font-bold text-xs uppercase tracking-wider text-right">Pricing (GST)</TableHead>
                       <TableHead className="font-bold text-xs uppercase tracking-wider text-center">Opening Qty</TableHead>
-                      <TableHead className="font-bold text-xs uppercase tracking-wider text-center">Sales</TableHead>
-                      <TableHead className="font-bold text-xs uppercase tracking-wider text-center">Purchase</TableHead>
-                      <TableHead className="font-bold text-xs uppercase tracking-wider text-center">Sales Return</TableHead>
-                      <TableHead className="font-bold text-xs uppercase tracking-wider text-center">Purchase Return</TableHead>
-                      <TableHead className="font-bold text-xs uppercase tracking-wider text-center">In-Transit</TableHead>
                       <TableHead className="font-bold text-xs uppercase tracking-wider text-center">Live Stock</TableHead>
                       <TableHead className="font-bold text-xs uppercase tracking-wider text-right">Stock Value</TableHead>
                       <TableHead className="font-bold text-xs uppercase tracking-wider text-right pr-6">Actions</TableHead>
@@ -216,42 +211,18 @@ export default function InventoryMasterPage() {
                             </span>
                           </div>
                         </TableCell>
-                        <TableCell className="text-center">
-                          <span className="text-xs font-medium">{p.openingStock || 0}</span>
-                        </TableCell>
-                        <TableCell className="text-center">
-                          <span className="text-xs font-medium text-red-600">
-                            {getProductStockMetrics(p.id, p, transactions, returns).sales}
-                          </span>
-                        </TableCell>
-                        <TableCell className="text-center">
-                          <span className="text-xs font-medium text-green-600">
-                            {getProductStockMetrics(p.id, p, transactions, returns).purchase}
-                          </span>
-                        </TableCell>
-                        <TableCell className="text-center">
-                          <span className="text-xs font-medium text-orange-600">
-                            {getProductStockMetrics(p.id, p, transactions, returns).salesReturn}
-                          </span>
-                        </TableCell>
-                        <TableCell className="text-center">
-                          <span className="text-xs font-medium text-amber-600">
-                            {getProductStockMetrics(p.id, p, transactions, returns).purchaseReturn}
-                          </span>
-                        </TableCell>
-                        <TableCell className="text-center">
-                          <span className="text-xs font-medium text-blue-600">
-                            {getProductStockMetrics(p.id, p, transactions, returns).inTransit}
-                          </span>
-                        </TableCell>
+                        
                         <TableCell className="text-center">
                           <span className={`text-xs font-bold ${p.stock <= p.minStockAlert ? 'text-destructive' : 'text-foreground'}`}>
                             {p.stock}
                           </span>
+</TableCell>
+                        <TableCell className="text-center">
+                          <span className="text-xs font-medium">{p.openingStock || 0}</span>
                         </TableCell>
-                        <TableCell className="text-right">
-                          <span className="text-xs font-medium">
-                            {formatCurrency(getProductStockMetrics(p.id, p, transactions, returns).stockValue)}
+                        <TableCell className="text-center">
+                          <span className={`text-xs font-bold ${p.stock <= p.minStockAlert ? 'text-destructive' : 'text-foreground'}`}>
+                            {p.stock}
                           </span>
                         </TableCell>
                         <TableCell className="text-right pr-6">

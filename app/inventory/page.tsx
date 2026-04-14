@@ -24,12 +24,13 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { formatCurrency } from '@/lib/format';
+import { getProductStockMetrics } from '@/lib/data-context';
 
 type SortField = 'name' | 'stock' | 'sellingPrice' | 'category';
 type SortOrder = 'asc' | 'desc';
 
 export default function InventoryPage() {
-  const { products, isLoaded } = useData();
+  const { products, transactions, returns, isLoaded } = useData();
   const [searchTerm, setSearchTerm] = useState('');
   const [sortField, setSortField] = useState<SortField>('name');
   const [sortOrder, setSortOrder] = useState<SortOrder>('asc');
@@ -205,12 +206,18 @@ export default function InventoryPage() {
                     </div>
                   </TableHead>
                   <TableHead className="font-bold text-xs uppercase tracking-wider text-right pr-6">Stock Value</TableHead>
+                  <TableHead className="font-bold text-xs uppercase tracking-wider text-center">Opening Qty</TableHead>
+                  <TableHead className="font-bold text-xs uppercase tracking-wider text-center">Sales</TableHead>
+                  <TableHead className="font-bold text-xs uppercase tracking-wider text-center">Purchase</TableHead>
+                  <TableHead className="font-bold text-xs uppercase tracking-wider text-center">Sales Return</TableHead>
+                  <TableHead className="font-bold text-xs uppercase tracking-wider text-center">Purchase Return</TableHead>
+                  <TableHead className="font-bold text-xs uppercase tracking-wider text-center">In-Transit</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {sortedProducts.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={6} className="h-24 text-center text-muted-foreground">
+                    <TableCell colSpan={13} className="h-24 text-center text-muted-foreground">
                       No products found.
                     </TableCell>
                   </TableRow>
@@ -264,9 +271,37 @@ export default function InventoryPage() {
                           )}
                         </div>
                       </TableCell>
-                      <TableCell className="text-right pr-6">
+                      <TableCell className="text-right">
                         <span className="font-semibold text-sm">
                           {formatCurrency(p.stock * p.sellingPrice)}
+                        </span>
+                      </TableCell>
+                      <TableCell className="text-center">
+                        <span className="text-xs font-medium">{p.openingStock || 0}</span>
+                      </TableCell>
+                      <TableCell className="text-center">
+                        <span className="text-xs font-medium text-red-600">
+                          {getProductStockMetrics(p.id, p, transactions, returns).sales}
+                        </span>
+                      </TableCell>
+                      <TableCell className="text-center">
+                        <span className="text-xs font-medium text-green-600">
+                          {getProductStockMetrics(p.id, p, transactions, returns).purchase}
+                        </span>
+                      </TableCell>
+                      <TableCell className="text-center">
+                        <span className="text-xs font-medium text-orange-600">
+                          {getProductStockMetrics(p.id, p, transactions, returns).salesReturn}
+                        </span>
+                      </TableCell>
+                      <TableCell className="text-center">
+                        <span className="text-xs font-medium text-amber-600">
+                          {getProductStockMetrics(p.id, p, transactions, returns).purchaseReturn}
+                        </span>
+                      </TableCell>
+                      <TableCell className="text-center">
+                        <span className="text-xs font-medium text-blue-600">
+                          {getProductStockMetrics(p.id, p, transactions, returns).inTransit}
                         </span>
                       </TableCell>
                     </TableRow>
