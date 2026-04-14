@@ -17,7 +17,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Search, Filter, Pencil, Trash2 } from 'lucide-react';
+import { Search, Filter, Pencil, Trash2, Eye } from 'lucide-react';
 import { Transaction } from '@/lib/types';
 import { toast } from 'sonner';
 
@@ -27,9 +27,10 @@ export default function PurchasesPage() {
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [supplierFilter, setSupplierFilter] = useState<string>('all');
   const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null);
+  const [viewingTransaction, setViewingTransaction] = useState<Transaction | null>(null);
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
 
-  const purchaseTransactions = transactions.filter((t) => t.type === 'purchase');
+  const purchaseTransactions = transactions.filter((t) => t.type === 'purchase' && t.status !== 'cancelled');
   const suppliers = companies.filter((c) => c.type === 'supplier');
 
   const getCompanyName = (companyId: string) => {
@@ -46,9 +47,10 @@ export default function PurchasesPage() {
   };
 
   const getPaymentStatus = (transactionId: string) => {
+    const transaction = transactions.find((t) => t.id === transactionId);
+    if (transaction?.status === 'cancelled') return 'cancelled';
     const balance = getRemainingBalance(transactionId);
     if (balance <= 0) return 'paid';
-    const transaction = transactions.find((t) => t.id === transactionId);
     if (transaction && transaction.amountPaid > 0) return 'partial';
     return 'pending';
   };
@@ -115,7 +117,7 @@ export default function PurchasesPage() {
                 <SelectValue placeholder="Status" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Status</SelectItem>
+                <SelectItem value="all">All Active</SelectItem>
                 <SelectItem value="paid">Paid</SelectItem>
                 <SelectItem value="partial">Partial</SelectItem>
                 <SelectItem value="pending">Pending</SelectItem>
@@ -190,6 +192,8 @@ export default function PurchasesPage() {
                                 ? 'secondary'
                                 : status === 'partial'
                                 ? 'outline'
+                                : status === 'cancelled'
+                                ? 'outline'
                                 : 'default'
                             }
                             className={
@@ -197,14 +201,24 @@ export default function PurchasesPage() {
                                 ? 'bg-emerald-100 text-emerald-800 hover:bg-emerald-100'
                                 : status === 'partial'
                                 ? 'bg-amber-100 text-amber-800 hover:bg-amber-100'
+                                : status === 'cancelled'
+                                ? 'bg-gray-100 text-gray-800 border-gray-300 hover:bg-gray-100'
                                 : 'bg-destructive text-white'
                             }
                           >
-                            {status === 'paid' ? 'Paid' : status === 'partial' ? 'Partial' : 'Pending'}
+                            {status === 'paid' ? 'Paid' : status === 'partial' ? 'Partial' : status === 'cancelled' ? 'CANCELLED' : 'Pending'}
                           </Badge>
                         </TableCell>
                         <TableCell className="text-right">
                           <div className="flex items-center justify-end gap-1">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-8 w-8 text-muted-foreground hover:text-primary hover:bg-primary/10"
+                              onClick={() => setViewingTransaction(transaction)}
+                            >
+                              <Eye className="w-4 h-4" />
+                            </Button>
                             <Button
                               variant="ghost"
                               size="icon"
@@ -253,6 +267,15 @@ export default function PurchasesPage() {
           )}
         </CardContent>
       </Card>
+
+      {viewingTransaction && (
+        <InvoiceDialog
+          transaction={viewingTransaction}
+          company={companies.find((c) => c.id === viewingTransaction.companyId)}
+          isOpen={!!viewingTransaction}
+          onOpenChange={(open) => !open && setViewingTransaction(null)}
+        />
+      )}
     </div>
   );
 }

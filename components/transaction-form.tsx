@@ -60,6 +60,7 @@ export function TransactionForm({ type, onClose, editTransaction }: TransactionF
   const { companies, products, addTransaction, updateTransaction } = useData();
   const [isOpen, setIsOpen] = useState(false);
   const [showInvoiceDialog, setShowInvoiceDialog] = useState(false);
+  const [transferPopup, setTransferPopup] = useState<{ oldSerial: string, newSerial: string } | null>(null);
   
   const [formData, setFormData] = useState({
     companyId: '',
@@ -210,7 +211,7 @@ export function TransactionForm({ type, onClose, editTransaction }: TransactionF
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent, action: 'save' | 'transfer' = 'save') => {
     e.preventDefault();
 
     if (!formData.companyId) {
@@ -266,8 +267,28 @@ export function TransactionForm({ type, onClose, editTransaction }: TransactionF
     };
 
     if (editTransaction) {
-      updateTransaction(transactionData);
-      toast.success(`${type === 'sale' ? 'Sale' : 'Purchase'} updated successfully`);
+      if (action === 'transfer') {
+        const newSerialNumber = generateSerialNumber(type);
+        const oldTransactionData: Transaction = {
+          ...editTransaction,
+          status: 'cancelled',
+          transferredTo: newSerialNumber
+        };
+        updateTransaction(oldTransactionData);
+
+        const newTransactionData: Transaction = {
+          ...transactionData,
+          id: `t${Date.now()}`,
+          serialNumber: newSerialNumber,
+          transferredFrom: editTransaction.serialNumber,
+          status: 'confirmed'
+        };
+        addTransaction(newTransactionData);
+        setTransferPopup({ oldSerial: editTransaction.serialNumber, newSerial: newSerialNumber });
+      } else {
+        updateTransaction(transactionData);
+        toast.success(`${type === 'sale' ? 'Sale' : 'Purchase'} updated successfully`);
+      }
     } else {
       addTransaction(transactionData);
       toast.success(`${type === 'sale' ? 'Sale' : 'Purchase'} invoice created successfully`);
@@ -288,8 +309,11 @@ export function TransactionForm({ type, onClose, editTransaction }: TransactionF
       billSerialNumber: '',
     });
     setItems([{ id: '1', productId: '', description: '', quantity: 1, unit: 'pcs', unitPrice: 0, gstRate: 18, lineTotal: 0 }]);
-    setIsOpen(false);
-    onClose?.();
+    
+    if (action !== 'transfer') {
+      setIsOpen(false);
+      onClose?.();
+    }
   };
 
   const relevantCompanies = companies.filter(
@@ -313,14 +337,30 @@ export function TransactionForm({ type, onClose, editTransaction }: TransactionF
       )}
       <DialogContent className="sm:max-w-5xl max-h-[95vh] flex flex-col p-0 overflow-hidden">
         <DialogHeader className="px-6 py-4 border-b">
-          <DialogTitle className="text-xl font-bold tracking-tight">
-            Create {type === 'sale' ? 'Sales Serial' : 'Purchase Order'}
+          <DialogTitle className="text-xl font-bold tracking-tight flex items-center gap-3">
+            {editTransaction ? `${type === 'sale' ? 'Sale' : 'Purchase'} Invoice` : `Create ${type === 'sale' ? 'Sales Serial' : 'Purchase Order'}`}
+            {editTransaction?.status === 'cancelled' && (
+              <Badge variant="outline" className="bg-gray-100 text-gray-800 border-gray-300 font-bold uppercase">CANCELLED</Badge>
+            )}
           </DialogTitle>
+          {editTransaction?.status === 'cancelled' && editTransaction.transferredTo && (
+            <div className="mt-2 p-3 bg-red-50 text-red-800 border border-red-200 rounded-md text-sm flex items-center gap-2">
+              <div className="w-2 h-2 bg-red-600 rounded-full animate-pulse" />
+              <span>This Bill has been <strong>Cancelled and Transferred</strong> to Serial Number: <strong>{editTransaction.transferredTo}</strong>.</span>
+            </div>
+          )}
+          {editTransaction?.transferredFrom && (
+            <div className="mt-2 p-3 bg-blue-50 text-blue-800 border border-blue-200 rounded-md text-sm flex items-center gap-2">
+              <div className="w-2 h-2 bg-blue-600 rounded-full" />
+              <span>This bill was transferred from cancelled Bill Serial Number: <strong>{editTransaction.transferredFrom}</strong>.</span>
+            </div>
+          )}
         </DialogHeader>
         
         <form onSubmit={handleSubmit} className="flex-1 overflow-hidden flex flex-col min-h-0">
           <div className="flex-1 overflow-y-auto px-6 py-6 space-y-8">
-            {/* Section 1: Basic Info & Logistics */}
+            <fieldset disabled={editTransaction?.status === 'cancelled'} className="space-y-8 border-0 p-0 m-0">
+              {/* Section 1: Basic Info & Logistics */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
               <div className="lg:col-span-2 space-y-4">
                 <div className="flex items-center gap-2 mb-2">
@@ -361,6 +401,20 @@ export function TransactionForm({ type, onClose, editTransaction }: TransactionF
                       className="bg-background/20 border-muted-foreground/20 cursor-not-allowed"
                     />
                   </div>
+                  
+                  {editTransaction && (
+                    <div className="space-y-2">
+                      <Label className="text-sm font-medium">Transaction Status</Label>
+                      <div className="h-10 flex items-center px-3 bg-muted/30 rounded-md border border-muted-foreground/10">
+                        <Badge 
+                          variant="outline" 
+                          className={editTransaction.status === 'cancelled' ? 'bg-gray-100 text-gray-800 border-gray-300 px-3' : 'bg-emerald-50 text-emerald-700 border-emerald-200 px-3'}
+                        >
+                          {editTransaction.status === 'cancelled' ? 'CANCELLED' : 'ACTIVE'}
+                        </Badge>
+                      </div>
+                    </div>
+                  )}
 
                   {type === 'purchase' && (
                     <div className="space-y-2">
@@ -741,7 +795,8 @@ export function TransactionForm({ type, onClose, editTransaction }: TransactionF
                 </div>
               </div>
             </div>
-          </div>
+            </fieldset>
+            </div>
           
           <DialogFooter className="px-6 py-4 border-t bg-muted/10">
             {editTransaction && (
@@ -755,17 +810,34 @@ export function TransactionForm({ type, onClose, editTransaction }: TransactionF
                 View / Print
               </Button>
             )}
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => setIsOpen(false)}
-            >
-              Cancel
-            </Button>
-            <Button type="submit" className="shadow-sm px-8">
-              <Save className="w-4 h-4 mr-2" />
-              Save
-            </Button>
+            <div className="flex gap-3">
+              {editTransaction && editTransaction.status !== 'cancelled' && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="text-amber-600 hover:text-amber-700 hover:bg-amber-50"
+                  onClick={(e) => handleSubmit(e as unknown as React.FormEvent, 'transfer')}
+                >
+                  Transfer to New Bill
+                </Button>
+              )}
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setIsOpen(false)}
+                disabled={editTransaction?.status === 'cancelled'}
+              >
+                Cancel
+              </Button>
+              <Button 
+                type="submit" 
+                className="shadow-sm px-8"
+                disabled={editTransaction?.status === 'cancelled'}
+              >
+                <Save className="w-4 h-4 mr-2" />
+                Save
+              </Button>
+            </div>
           </DialogFooter>
         </form>
       </DialogContent>
@@ -776,6 +848,37 @@ export function TransactionForm({ type, onClose, editTransaction }: TransactionF
           isOpen={showInvoiceDialog}
           onOpenChange={setShowInvoiceDialog}
         />
+      )}
+      
+      {transferPopup && (
+        <Dialog open={true} onOpenChange={() => {
+          setTransferPopup(null);
+          setIsOpen(false);
+          onClose?.();
+        }}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle>Transfer Successful</DialogTitle>
+            </DialogHeader>
+            <div className="py-4">
+              <p className="text-sm text-foreground">
+                The bill <strong>{transferPopup.oldSerial}</strong> has been cancelled and its details have been transferred to a new serial number:
+              </p>
+              <p className="text-xl font-bold mt-4 text-center py-3 bg-muted rounded-lg text-primary">
+                {transferPopup.newSerial}
+              </p>
+            </div>
+            <DialogFooter>
+              <Button onClick={() => {
+                setTransferPopup(null);
+                setIsOpen(false);
+                onClose?.();
+              }} className="w-full sm:w-auto">
+                Got it
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       )}
     </Dialog>
   );

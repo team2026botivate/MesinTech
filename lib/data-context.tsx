@@ -104,16 +104,18 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
     setTransactions([...transactions, transaction]);
     
     // Update Stock
-    if (transaction.productId && transaction.quantity) {
-      const stockChangeType = transaction.type === 'purchase' ? 'add' : 'subtract';
-      updateProductStock(transaction.productId, transaction.quantity, stockChangeType);
-    } else if (transaction.lineItems) {
-      transaction.lineItems.forEach(item => {
-        if (item.productId) {
-          const stockChangeType = transaction.type === 'purchase' ? 'add' : 'subtract';
-          updateProductStock(item.productId, item.quantity, stockChangeType);
-        }
-      });
+    if (transaction.status !== 'cancelled') {
+      if (transaction.productId && transaction.quantity) {
+        const stockChangeType = transaction.type === 'purchase' ? 'add' : 'subtract';
+        updateProductStock(transaction.productId, transaction.quantity, stockChangeType);
+      } else if (transaction.lineItems) {
+        transaction.lineItems.forEach(item => {
+          if (item.productId) {
+            const stockChangeType = transaction.type === 'purchase' ? 'add' : 'subtract';
+            updateProductStock(item.productId, item.quantity, stockChangeType);
+          }
+        });
+      }
     }
   };
 
@@ -151,7 +153,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
     const oldTransaction = transactions.find(t => t.id === transaction.id);
     
     // Reverse old stock update
-    if (oldTransaction) {
+    if (oldTransaction && oldTransaction.status !== 'cancelled') {
       if (oldTransaction.productId && oldTransaction.quantity) {
         const reverseType = oldTransaction.type === 'purchase' ? 'subtract' : 'add';
         updateProductStock(oldTransaction.productId, oldTransaction.quantity, reverseType);
@@ -166,16 +168,18 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
     }
 
     // Apply new stock update
-    if (transaction.productId && transaction.quantity) {
-      const stockChangeType = transaction.type === 'purchase' ? 'add' : 'subtract';
-      updateProductStock(transaction.productId, transaction.quantity, stockChangeType);
-    } else if (transaction.lineItems) {
-      transaction.lineItems.forEach(item => {
-        if (item.productId) {
-          const stockChangeType = transaction.type === 'purchase' ? 'add' : 'subtract';
-          updateProductStock(item.productId, item.quantity, stockChangeType);
-        }
-      });
+    if (transaction.status !== 'cancelled') {
+      if (transaction.productId && transaction.quantity) {
+        const stockChangeType = transaction.type === 'purchase' ? 'add' : 'subtract';
+        updateProductStock(transaction.productId, transaction.quantity, stockChangeType);
+      } else if (transaction.lineItems) {
+        transaction.lineItems.forEach(item => {
+          if (item.productId) {
+            const stockChangeType = transaction.type === 'purchase' ? 'add' : 'subtract';
+            updateProductStock(item.productId, item.quantity, stockChangeType);
+          }
+        });
+      }
     }
 
     setTransactions(transactions.map((t) => (t.id === transaction.id ? transaction : t)));
@@ -201,7 +205,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
 
   const deleteTransaction = (transactionId: string) => {
     const transaction = transactions.find(t => t.id === transactionId);
-    if (transaction) {
+    if (transaction && transaction.status !== 'cancelled') {
       if (transaction.productId && transaction.quantity) {
         const reverseType = transaction.type === 'purchase' ? 'subtract' : 'add';
         updateProductStock(transaction.productId, transaction.quantity, reverseType);

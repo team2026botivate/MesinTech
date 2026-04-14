@@ -28,6 +28,7 @@ export default function BillsPage() {
   const getPaymentStatus = (transactionId: string) => {
     const transaction = transactions.find((t) => t.id === transactionId);
     if (!transaction) return 'pending';
+    if (transaction.status === 'cancelled') return 'cancelled';
     const paid = payments.filter((p) => p.linkedTransactionId === transactionId).reduce((sum, p) => sum + p.amount, 0);
     const balance = (transaction.totalAmount || 0) - paid;
     if (balance <= 0) return 'paid';
@@ -53,11 +54,7 @@ export default function BillsPage() {
 
         const matchesType = typeFilter === 'all' || t.type === typeFilter;
 
-        const balance = (transactions.find((tr) => tr.id === t.id)?.totalAmount || 0) - payments.filter((p) => p.linkedTransactionId === t.id).reduce((sum, p) => sum + p.amount, 0);
-        let status = 'pending';
-        if (balance <= 0) status = 'paid';
-        else if ((transactions.find((tr) => tr.id === t.id)?.amountPaid || 0) > 0) status = 'partial';
-        
+        const status = getPaymentStatus(t.id);
         const matchesStatus = statusFilter === 'all' || status === statusFilter;
 
         return matchesSearch && matchesType && matchesStatus;
@@ -164,6 +161,7 @@ export default function BillsPage() {
                   <SelectItem value="paid">Paid</SelectItem>
                   <SelectItem value="partial">Partial</SelectItem>
                   <SelectItem value="pending">Pending</SelectItem>
+                  <SelectItem value="cancelled">Cancelled</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -215,7 +213,7 @@ export default function BillsPage() {
                       .filter((p) => p.linkedTransactionId === transaction.id)
                       .reduce((sum, p) => sum + p.amount, 0);
                     const balance = (transaction.totalAmount || 0) - paidAmount;
-                    const status = balance <= 0 ? 'paid' : transaction.amountPaid > 0 ? 'partial' : 'pending';
+                    const status = getPaymentStatus(transaction.id);
 
                     return (
                       <TableRow key={transaction.id}>
@@ -244,6 +242,8 @@ export default function BillsPage() {
                                 ? 'secondary'
                                 : status === 'partial'
                                 ? 'outline'
+                                : status === 'cancelled'
+                                ? 'outline'
                                 : 'default'
                             }
                             className={
@@ -251,10 +251,12 @@ export default function BillsPage() {
                                 ? 'bg-emerald-100 text-emerald-800 hover:bg-emerald-100'
                                 : status === 'partial'
                                 ? 'bg-amber-100 text-amber-800 hover:bg-amber-100'
+                                : status === 'cancelled'
+                                ? 'bg-gray-100 text-gray-800 border-gray-300 hover:bg-gray-100'
                                 : 'bg-destructive text-white'
                             }
                           >
-                            {status === 'paid' ? 'Paid' : status === 'partial' ? 'Partial' : 'Pending'}
+                            {status === 'paid' ? 'Paid' : status === 'partial' ? 'Partial' : status === 'cancelled' ? 'CANCELLED' : 'Pending'}
                           </Badge>
                         </TableCell>
                         <TableCell className="text-right">

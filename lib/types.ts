@@ -91,6 +91,8 @@ export type Transaction = {
   paymentMethod?: 'cash' | 'bill';
   cashSerialNumber?: string;
   billSerialNumber?: string;
+  transferredFrom?: string;
+  transferredTo?: string;
 };
 
 export type Return = {
